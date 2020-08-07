@@ -1,4 +1,9 @@
+[TOC]
+
+
+
 # AlgorithmTemplate
+
 记录做题用的模板,免得每次都现写
 
 ## 快速排序
@@ -27,3 +32,33 @@ void quick_sort(int q[],int l,int r){
     quick_sort(q,j+1,r);
 }
 ```
+
+
+
+## 归并排序
+
+2020年8月7日添加
+
+适用题目：
+
+1. AcWing 787
+
+```c++
+//需要开一个辅助数组 tmp[maxn],存放数据数据 q[maxn]，排好序的数据存放在q[maxn]中
+void merge_sort(int q[],int l,int r){
+    if(l>=r) return;
+    int mid=l+(r-l)/2;
+    merge_sort(q,l,mid);
+    merge_sort(q,mid+1,r);
+    int k=0,i=l,j=mid+1;
+    while(i<=mid&&j<=r){
+        if(q[i]<=q[j]) tmp[k++]=q[i++];
+        else tmp[k++]=q[j++];
+    }
+    while(i<=mid) tmp[k++]=q[i++];
+    while(j<=r) tmp[k++]=q[j++];
+    //i遍历 [l,r],j遍历tmp[maxn]中的k个数据[0,k)
+    for(int i=l,j=0;i<=r,j<k;i++,j++) q[i]=tmp[j];
+}
+```
+
