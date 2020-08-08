@@ -141,6 +141,10 @@ int main(){
 
 2020年8月8日
 
+复习次数：1
+
+早上做的，晚上就忘，- - 2020年8月8日20点41分
+
 模板：归并排序
 
 大体思路归并排序的时候，统计逆序对数量，等于左半部分的数量+右半部分的数量+左右共同构成的数量（mid-i+1）
@@ -222,4 +226,36 @@ int main(){
     return 0;
 }
 ```
+
+### AcWing 790. 数的三次方根
+
+模板：浮点数二分
+
+需要注意的点，**double输入用lf 输出用f**
+
+背过，如果背不过，使用cin>>x  
+
+题解：
+
+```c++
+#include<iostream>
+using namespace std;
+
+int main(){
+    double x;
+    // float x;
+    scanf("%lf",&x);
+    double l=-10000,r=10000;
+    while(r-l>1e-8){
+        double m=l+(r-l)/2;
+        if(m*m*m>=x) r=m;
+        else l=m;
+    }
+    printf("%.6f\n",l);
+    return 0;
+}
+//两个问题，为什么不能用float
+```
+
+
 

@@ -80,9 +80,7 @@ void merge_sort(int q[],int l,int r){
 }
 ```
 
-
-
-## 二分
+## 整数二分
 
 2020年8月8日
 
@@ -112,6 +110,26 @@ while(l<r){
     int mid=l+(r-l+1)/2;
     if(q[mid]<=x) l=mid;
     else r=mid-1;
+}
+```
+
+## 浮点二分
+
+2020年8月9日
+
+```c++
+bool check(double x) {/* ... */} // 检查x是否满足某种性质
+
+double bsearch_3(double l, double r)
+{
+    const double eps = 1e-6;   // eps 表示精度，取决于题目对精度的要求
+    while (r - l > eps)
+    {
+        double mid = (l + r) / 2;
+        if (check(mid)) r = mid;
+        else l = mid;
+    }
+    return l;
 }
 ```
 
