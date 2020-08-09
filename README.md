@@ -133,3 +133,99 @@ double bsearch_3(double l, double r)
 }
 ```
 
+## 高精度
+
+2020年8月9日
+
+### 高精度加法
+
+A,B中数是倒着存的，也就是A[0]是个位，A[1]是十位，依次类推。考虑进位就可以了
+
+```c++
+
+vector<int> add(vector<int> &A,vector<int> &B){
+    vector<int> C;
+    int t=0;
+    if(A.size()<B.size()) return add(B,A);
+    for(int i=0;i<A.size();i++){
+        t+=A[i];
+        if(i<B.size()) t+=B[i];
+        C.push_back(t%10);
+        t/=10;
+    }
+    if(t) C.push_back(1);
+    return C;
+}
+```
+
+### 高精度减法
+
+减法存在一个大的减小的问题，所以在做减法之前，要把数据处理成大的数字在前面
+
+if(A>=B)   sub(A,B)
+
+else sub(B,A)//输出的时候最前面加一个负号即可
+
+减的时候需要注意借位
+
+```c++
+vector<int> sub(vector<int> &A,vector<int> &B){
+    vector<int> C;
+    int t=0;
+    for(int i=0;i<A.size();i++){
+        t=A[i]-t;
+        if(i<B.size()) t-=B[i];
+        C.push_back((t+10)%10);
+        if(t<0) t=1;
+        else t=0;
+    }
+    //去掉前导零，不要忘记了
+    while(C.size()>1&&C.back()==0) C.pop_back();
+    return C;
+}
+```
+
+
+
+### 高精度乘法
+
+大数乘以一个小一点的数。
+
+注意最后一个进位，如果A处理完了，可能还有进位，要处理。注意去掉前导零。
+
+```c++
+vector<int> multi(vector<int> &A,int B){
+    vector<int> C;
+    int t=0;
+    for(int i=0;i<A.size()||t;i++){
+        if(i<A.size()) t+=A[i]*B;
+        C.push_back(t%10);
+        t/=10;
+    }
+    //去除前导零 WA
+    while(C.size()>1&&C.back()==0) C.pop_back();
+    return C;
+}
+```
+
+
+
+### 高精度除法
+
+与前面三个模板有区别，C是正着存数据的，所以最后要把C反过来，然后去除前导零。
+
+```c++
+vector<int> div(vector<int> &A,int B,int &r){
+    vector<int> C;
+    r=0;
+    for(int i=A.size()-1;i>=0;i--){
+        r=r*10+A[i];
+        C.push_back(r/B);
+        r%=B;
+    }
+    reverse(C.begin(),C.end());
+    while(C.size()>1&&C.back()==0) C.pop_back();
+    return C;
+}
+```
+
