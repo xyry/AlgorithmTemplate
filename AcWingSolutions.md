@@ -633,3 +633,206 @@ int main(){
 
 
 
+## 双指针算法
+
+2020年8月11日
+
+### AcWing 799. 最长连续不重复子序列
+
+模拟双指针
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e5+10;
+int n,res;
+int a[N],s[N];
+
+int main(){
+    scanf("%d",&n);
+    res=0;
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    for(int i=0,j=0;i<n;i++){
+        s[a[i]]++;
+        while(s[a[i]]>1){
+            s[a[j]]--;
+            j++;
+        }
+        res=max(res,i-j+1);
+    }
+    printf("%d",res);
+    return 0;
+}
+```
+
+
+
+### AcWing 800. 数组元素的目标和
+
+裸题
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int n,m,x;
+int a[N],b[N];
+int main(){
+    scanf("%d%d%d",&n,&m,&x);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    for(int i=0;i<m;i++) scanf("%d",&b[i]);
+    int i=0,j=m-1;
+    while(i<n&&j>=0){
+        int cur=a[i]+b[j];
+        if(cur==x){
+            printf("%d %d\n",i,j);
+            break;
+        } 
+        if(cur<x) i++;
+        else j--;
+    }
+    return 0;
+    
+}
+```
+
+### AcWing 801. 二进制中1的个数
+
+挺有意思的，使用了lowbit，求出x中最后一个1。
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int a[N];
+int n;
+
+int lowbit(int n){
+    return n&(-n);
+}
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    for(int i=0;i<n;i++){
+        int x=a[i];
+        int res=0;
+        //如果x不为0，减去lowbit求出最后一个1的位置，不明白可以手推一下
+        while(x) x-=lowbit(x),res++;
+        printf("%d ",res);
+    }
+    return 0;
+}
+```
+
+### AcWing 802. 区间合
+
+思路：离散化，用二分找坐标，然后用前缀和处理。
+
+```c++
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+typedef pair<int,int> PII;
+
+const int N=3e5+10;
+int a[N],s[N];
+int n,m;
+vector<int> alls;
+vector<PII> adds,query;
+
+int find(int x){
+    int l=0,r=alls.size()-1;
+    while(l<r){
+        int mid=l+(r-l)/2;
+        if(alls[mid]>=x) r=mid;
+        else l=mid+1;
+    }
+    return r+1;//1,2,3,...,n 为了方便处理前缀和，所以下标要从1开始
+    
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=0;i<n;i++){
+        int x,c;
+        scanf("%d%d",&x,&c);
+        alls.push_back(x);
+        adds.push_back({x,c});
+    }
+    for(int i=0;i<m;i++){
+        int l,r;
+        scanf("%d%d",&l,&r);
+        query.push_back({l,r});
+        alls.push_back(l);
+        alls.push_back(r);
+    }
+    
+    sort(alls.begin(),alls.end());
+    alls.erase(unique(alls.begin(),alls.end()),alls.end());
+    for(auto item:adds){
+        int x=find(item.first);
+        a[x]+=item.second;
+    }
+    
+    for(int i=1;i<=alls.size();i++){
+        s[i]=s[i-1]+a[i];
+    }
+    
+    for(auto item:query){
+        int l=find(item.first);
+        int r=find(item.second);
+        printf("%d\n",s[r]-s[l-1]);
+    }
+    return 0;
+}
+```
+
+### AcWing 803. 区间合并
+
+思路，对**左端点排序**，然后操作，具体看代码
+
+```c++
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+typedef pair<int,int> PII;
+
+int n;
+vector<PII> segs;
+
+void merge(vector<PII> &segs){
+    vector<PII> res;
+    sort(segs.begin(),segs.end());
+    int st=-2e9,ed=-2e9;
+    for(auto seg:segs){
+        if(ed<seg.first){
+            if(st!=-2e9) res.push_back({st,ed});
+            st=seg.first,ed=seg.second;
+        }else{
+            ed=max(ed,seg.second);
+        }
+    }
+    if(st!=-2e9) res.push_back({st,ed});
+    segs=res;
+}
+
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int l,r;
+        scanf("%d%d",&l,&r);
+        segs.push_back({l,r});
+    }
+    merge(segs);
+    printf("%ld\n",segs.size());
+    return 0;
+}
+```
+
+
+
