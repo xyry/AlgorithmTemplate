@@ -262,3 +262,158 @@ S[x1, y1] += c, S[x2 + 1, y1] -= c, S[x1, y2 + 1] -= c, S[x2 + 1, y2 + 1] += c
 返回n的最后一位1：lowbit(n) = n & -n
 ```
 
+## 单链表
+
+数组模拟单链表，算法中竞赛大多数都是这么做。
+
+快，因为数组模拟单链表相当于静态链表，用指针实现的话，new的操作开辟动态空间很慢。
+
+## 并查集
+
+```c++
+p[N]记得初始化
+for(int i=1;i<=n;i++) p[i]=i;
+
+//查找父节点+路径压缩
+int find(int x){
+    if(p[x]!=x) p[x]=find(p[x]);
+    return p[x];
+}
+```
+
+## 堆排序
+
+```c++
+核心操作就是down操作和up操作
+
+//建堆操作从n/2开始
+for(int i=n/2;i>=1;i--) down(i);
+    
+//删除操作
+swap(h[1],h[size]);
+down(1);
+
+
+void down(int u){
+    int t=u;
+    if(u*2<=s&&h[u*2]<h[t]) t=u*2;
+    if(u*2+1<=s&&h[u*2+1]<h[t]) t=u*2+1;
+    if(t!=u){
+        swap(h[u],h[t]);
+        down(t);
+    }
+}
+
+void up(int u){
+    int t=u;
+    if(u/2&&h[t]<h[u/2]) t=u/2;
+    if(t!=u){
+        swap(h[t],h[u]);
+        up(t);
+    }
+}
+
+```
+
+
+
+## 哈希表
+
+### 拉链法
+
+```c++
+const int N=10003;
+//该值设置为一个质数，并且离2的n次幂越远越好，这样冲突概率最小。
+int h[N],e[N],ne[N],idx;
+//拉链法，用一条单链表存储映射到同一个值k的数x
+void insert(int x){
+    //x可能为负数，负数取模后还是负数，所以要+N，在对N取模
+    int k=(x%N+N)%N;
+    //单链表头插法操作
+    e[idx]=x;
+    ne[idx]=h[k];
+    h[k]=idx++;
+}
+
+bool find(int x){
+    int k=(x%N+N)%N;
+    //从该链表开始找这个数
+    for(int i=h[k];i!=-1;i=ne[i]){
+        if(e[i]==x) return true;
+    }
+    return false;
+}
+```
+
+### 开放寻址法
+
+```c++
+const int N=200003,null=0x3f3f3f3f;
+//用null表示h[]中没有存放数，也就是初始值
+int h[N];
+//开放寻址法
+
+//找到在哪里放x 
+//如果x已经存在于h[]数组中，那么返回x放的位置k,
+//如果x不存在于h[]数组中，返回x要放的位置k
+int find(int x){
+    int k=(x%N+N)%N;
+    while(h[k]!=null&&h[k]!=x){
+        k++;
+        //如果k到了数组最后一个位置，从头开始重新找
+        if(k==N) k=0;
+    }
+    return k;    
+}
+```
+
+### 字符串哈希
+
+字符串前缀哈希，用来解决字符串的难题。
+
+要求字符对应的值不能为0，不然会有冲突。
+
+P一般取131或者13331
+
+Q一般取2的64次方，在代码里用ULL表示，这样溢出就相当于取模了。
+
+非常巧的做法
+
+```c++
+#include<iostream>
+typedef unsigned long long ULL;
+using namespace std;
+
+const int N=1e5+10,P=131;
+int n,m;
+char str[N];
+ULL h[N],p[N];
+
+ULL get(int l,int r){
+    //获取字符串str[l:r]范围的哈希值
+    return h[r]-h[l-1]*p[r-l+1];
+}
+
+int main(){
+    //为了让字符串下标从1开始
+    scanf("%d%d%s",&n,&m,str+1);
+    //预处理p数组，同时处理h数组
+    //str[i]只要不让字符等于0即可
+    p[0]=1;
+    for(int i=1;i<=n;i++){
+        p[i]=p[i-1]*P;
+        h[i]=h[i-1]*P+str[i];
+    }
+    
+    
+    while(m--){
+        int l1,r1,l2,r2;
+        scanf("%d%d%d%d",&l1,&r1,&l2,&r2);
+        if(get(l1,r1)==get(l2,r2)) puts("Yes");
+        else puts("No");
+        
+    }
+    return 0;
+}
+```
+

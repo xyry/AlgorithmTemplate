@@ -4,9 +4,11 @@ AcWing 做题记录
 
 # 算法基础课
 
-## 排序
+## 基础算法
 
-### AcWing 785. 快速排序
+### 排序
+
+#### AcWing 785. 快速排序
 
 模板：快排
 
@@ -40,7 +42,7 @@ int main(){
 }
 ```
 
-### AcWing 786. 第k个数
+#### AcWing 786. 第k个数
 
 模板：快排
 
@@ -78,7 +80,7 @@ int main(){
 
 
 
-### AcWing 787. 归并排序
+#### AcWing 787. 归并排序
 
 模板：归并排序
 
@@ -137,7 +139,7 @@ int main(){
 }
 ```
 
-### AcWing 788. 逆序对的数量
+#### AcWing 788. 逆序对的数量
 
 2020年8月8日
 
@@ -184,9 +186,9 @@ int main(){
 }
 ```
 
-## 二分
+### 二分
 
-### AcWing 789. 数的范围 
+#### AcWing 789. 数的范围 
 
 模板：二分模板
 
@@ -227,7 +229,7 @@ int main(){
 }
 ```
 
-### AcWing 790. 数的三次方根
+#### AcWing 790. 数的三次方根
 
 模板：浮点数二分
 
@@ -259,11 +261,11 @@ int main(){
 
 
 
-## 高精度
+### 高精度
 
 2020年8月9日 下面4道题
 
-### AcWing 791. 高精度加法
+#### AcWing 791. 高精度加法
 
 给定两个正整数，计算它们的和。
 
@@ -308,7 +310,7 @@ int main(){
 }
 ```
 
-### Acwing 792. 高精度减法
+#### Acwing 792. 高精度减法
 
 给定两个正整数，计算它们的差，计算结果可能为负数。
 
@@ -374,7 +376,7 @@ int main(){
 
 
 
-### Acwing 793. 高精度乘法
+#### Acwing 793. 高精度乘法
 
 给定两个正整数A和B，请你计算A * B的值。
 
@@ -424,7 +426,7 @@ int main(){
 
 
 
-### Acwing 794. 高精度除法
+#### Acwing 794. 高精度除法
 
 给定两个非负整数A，B，请你计算 A / B的商和余数。
 
@@ -474,9 +476,9 @@ int main(){
 
 
 
-## 前缀和与差分
+### 前缀和与差分
 
-### AcWing 795. 前缀和
+#### AcWing 795. 前缀和
 
 一维前缀和，注意数组下标从1开始，这样方便。
 
@@ -504,7 +506,7 @@ int main(){
 
 
 
-### AcWing 796. 子矩阵的和
+#### AcWing 796. 子矩阵的和
 
 二维前缀和，注意画图理解。
 
@@ -539,7 +541,7 @@ int main(){
 
 
 
-### AcWing 797. 差分
+#### AcWing 797. 差分
 
 一维差分
 
@@ -576,7 +578,7 @@ int main(){
 
 
 
-### AcWing 798. 差分矩阵
+#### AcWing 798. 差分矩阵
 
 二维差分，最后更新的时候注意是对bij进行求和，和求前缀和矩阵是反过来的。注意画图理解。
 
@@ -633,11 +635,11 @@ int main(){
 
 
 
-## 双指针算法
+### 双指针算法
 
 2020年8月11日
 
-### AcWing 799. 最长连续不重复子序列
+#### AcWing 799. 最长连续不重复子序列
 
 模拟双指针
 
@@ -668,7 +670,7 @@ int main(){
 
 
 
-### AcWing 800. 数组元素的目标和
+#### AcWing 800. 数组元素的目标和
 
 裸题
 
@@ -697,7 +699,7 @@ int main(){
 }
 ```
 
-### AcWing 801. 二进制中1的个数
+#### AcWing 801. 二进制中1的个数
 
 挺有意思的，使用了lowbit，求出x中最后一个1。
 
@@ -726,7 +728,7 @@ int main(){
 }
 ```
 
-### AcWing 802. 区间合
+#### AcWing 802. 区间合
 
 思路：离散化，用二分找坐标，然后用前缀和处理。
 
@@ -790,7 +792,7 @@ int main(){
 }
 ```
 
-### AcWing 803. 区间合并
+#### AcWing 803. 区间合并
 
 思路，对**左端点排序**，然后操作，具体看代码
 
@@ -834,5 +836,928 @@ int main(){
 }
 ```
 
+## 数据结构
 
+### 单链表
+
+#### AcWing 826. 单链表
+
+注意scanf()读字符，要记得吃回车，使用cin就不用考虑这么多，不说了，都是泪。
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int m;
+
+int head,idx;
+int e[N],ne[N];
+
+void init(){
+    head=-1;
+    idx=0;
+}
+
+void add_to_head(int x){
+    e[idx]=x;
+    ne[idx]=head;
+    head=idx++;
+}
+
+void add(int k,int x){
+    e[idx]=x;
+    ne[idx]=ne[k];
+    ne[k]=idx++;
+    
+}
+
+void remove(int k){
+    ne[k]=ne[ne[k]];
+}
+
+
+
+int main(){
+    // scanf("%d\n",&m);
+    cin>>m;
+    //没吃回车，数据输入都读不完
+    //太艹了，cin就会吃掉回车，scanf要手动吃回车
+    init();
+    while(m--){
+        char op;
+        int k,x;
+        cin>>op;
+        // scanf("%c",&op);
+        if(op=='H'){
+            cin>>x;
+            // scanf("%d\n",&x);
+            // cout<<op<<" "<<x<<endl;
+            add_to_head(x);
+        }else if(op=='D'){
+            cin>>k;
+            // scanf("%d\n",&k);
+            // cout<<op<<" "<<k<<endl;
+            if(!k) head=ne[head];
+            else remove(k-1);
+        }else{
+            cin>>k>>x;
+            // scanf("%d %d\n",&k,&x);
+            // cout<<op<<" "<<k<<" "<<x<<endl;
+            add(k-1,x);
+        }
+        // cout<<op<<" ";
+        // for(int i=head;i!=-1;i=ne[i]) printf("%d ",e[i]);
+        // puts("");
+    }
+    for(int i=head;i!=-1;i=ne[i]) printf("%d ",e[i]);
+    puts("");
+    return 0;
+}
+```
+
+### 双链表
+
+我们令 0为左端点 1为右端点，具体看代码，
+
+注意idx++ TLE 30分钟
+
+```c++
+#include<iostream>
+#include<string>
+using namespace std;
+const int N=1e5+10;
+int e[N],l[N],r[N];
+int m,idx;
+
+void init(){
+    r[0]=1,l[1]=0;
+    idx=2;
+}
+
+void add(int k,int x){
+    e[idx]=x;
+    l[idx]=k;
+    r[idx]=r[k];
+    l[r[k]]=idx;
+    r[k]=idx;
+    idx++;
+}
+
+void remove(int k){
+    r[l[k]]=r[k];
+    l[r[k]]=l[k];
+}
+
+int main(){
+    cin>>m;
+    init();
+    while(m--){
+        string op;
+        int x,k;
+        cin>>op;
+        if(!op.compare("R")){
+            cin>>x;
+            // cout<<"R1"<<endl;
+            add(l[1],x);
+        }else if(!op.compare("L")){
+            cin>>x;
+            // cout<<"L1"<<endl;
+            add(0,x);
+        }else if(!op.compare("D")){
+            cin>>k;
+            // cout<<"D1"<<endl;
+            remove(k+1);
+        }else if(!op.compare("IL")){
+            cin>>k>>x;
+            // cout<<"IL"<<k<<x<<endl;
+            add(l[k+1],x);
+        }else if(!op.compare("IR")){
+            cin>>k>>x;
+            // cout<<"IR"<<k<<x<<endl;
+            add(k+1,x);
+        }
+        // cout<<op<<" ";
+        // for(int i=0;i!=1;i=l[i]) cout<<e[i]<<" ";
+    }
+    for(int i=r[0];i!=1;i=r[i]) cout<<e[i]<<" ";
+    puts("");
+    return 0;
+}
+```
+
+### 栈
+
+模拟栈
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e5+10;
+
+int stack[N];
+int m,top;
+
+void init(){
+    top=-1;
+}
+
+void push(int x){
+    stack[++top]=x;
+}
+void pop(){
+    top--;
+}
+
+bool empty(){
+    if(top!=-1) return true;
+    else return false;
+}
+
+int query(){
+    return stack[top];
+}
+
+int main(){
+    init();
+    cin>>m;
+    string op;
+    int x;
+    while(m--){
+        cin>>op;
+        if(!op.compare("push")){
+            cin>>x;
+            push(x);
+        }else if(!op.compare("pop")){
+            pop();
+        }else if(!op.compare("empty")){
+            if(empty()){
+                cout<<"NO"<<endl;
+            }else{
+                cout<<"YES"<<endl;
+            }
+        }else{
+            cout<<query()<<endl;
+        }
+    }
+    return 0;
+}
+```
+
+
+
+### 队列
+
+#### AcWing 829. 模拟队列
+
+直接模拟
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int m;
+int q[N],hh,tt;
+
+void init(){
+    hh=0;
+    tt=-1;
+}
+
+void push(int x){
+    q[++tt]=x;
+}
+
+void pop(){
+    hh++;
+}
+
+bool empty(){
+    if(tt>=hh) return true;
+    else return false;
+}
+
+int main(){
+    cin>>m;
+    init();
+    while(m--){
+        string op;
+        int x;
+        cin>>op;
+        if(op=="push"){
+            cin>>x;
+            push(x);
+        }else if(op=="pop"){
+            pop();
+        }else if(op=="empty"){
+            if(!empty()) cout<<"YES"<<endl;
+            else cout<<"NO"<<endl;
+        }else{
+            cout<<q[hh]<<endl;
+        }
+    }
+    return 0;
+}
+```
+
+### 单调栈
+
+#### AcWing 830. 单调栈
+
+如果栈顶元素比其后面的元素小，那么后面的元素在后面的处理中永远不会被用到，所以做的时候处理掉，不断地更新栈。
+
+```c++
+#include<iostream>
+
+using namespace std;
+
+const int N=1e5+10;
+int a[N],stk[N];
+int top,n;
+
+int main(){
+    scanf("%d",&n);
+    top=-1;
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    for(int i=0;i<n;i++){
+        if(top==-1){
+            cout<<"-1 ";
+        }else if(a[i]>stk[top]){
+            cout<<stk[top]<<" ";
+        }else if(a[i]<=stk[top]){
+            while(a[i]<=stk[top]&&top>-1){
+                top--;
+            }
+            if(top==-1) cout<<"-1 ";
+            else{
+                cout<<stk[top]<<" ";
+            }
+        }
+        stk[++top]=a[i];
+    }
+    return 0;
+}
+
+```
+
+### 单调队列
+
+#### AcWing 154. 滑动窗口
+
+这题有点难写，单调栈的思路
+
+```c++
+#include<iostream>
+#include<vector>
+using namespace std;
+const int N=1e6+10;
+int n,k;
+int a[N],q[N],hh,tt;
+
+int main(){
+    scanf("%d%d",&n,&k);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    hh=0,tt=-1;
+    for(int i=0;i<n;i++){
+        //也就是q[hh]对应的坐标在窗口内，不在的话hh右移
+        while(hh<=tt&&q[hh]<i-k+1) hh++;
+        while(hh<=tt&&a[q[tt]]>=a[i]) tt--;
+        q[++tt]=i;
+        if(i>=k-1) printf("%d ",a[q[hh]]);
+    }
+    puts("");
+    hh=0,tt=-1;
+    for(int i=0;i<n;i++){
+        while(hh<=tt&&q[hh]<i-k+1) hh++;
+        while(hh<=tt&&a[q[tt]]<=a[i]) tt--;
+        q[++tt]=i;
+        if(i>=k-1) printf("%d ",a[q[hh]]);
+    }
+    
+    return 0;
+}
+```
+
+### KMP
+
+#### AcWing 831. KMP字符串
+
+KMP算法，说实话，看了很多遍，意思懂了，代码不太明白
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+const int M=1e6+10;
+char p[N],s[M];
+int n,m;
+int ne[N];
+int main(){
+    //字符串下标从1开始存
+    cin>>n>>p + 1>>m>>s + 1;
+    for(int i=2,j=0;i<=n;i++){
+        while(j&&p[i]!=p[j+1]) j=ne[j];
+        if(p[i]==p[j+1]) j++;
+        ne[i]=j;
+    }
+    
+    for(int i=0,j=0;i<=m;i++){
+        while(j&&s[i]!=p[j+1]) j=ne[j];
+        if(s[i]==p[j+1]) j++;
+        if(j==n){
+            cout<<i-n<<" ";
+            j=ne[j];
+        }
+    }
+    return 0;
+}
+```
+
+### Trie
+
+2020年8月14日
+
+#### AcWing 835. Trie字符串统计
+
+模板题
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int idx=0;
+int son[N][26],cnt[N];
+
+
+void insert(char str[]){
+    int p=0;
+    for(int i=0;str[i];i++){
+        int u=str[i]-'a';
+        if(!son[p][u]) son[p][u]=++idx;
+        p=son[p][u];
+    }
+    cnt[p]++;
+}
+int query(char str[]){
+    int p=0;
+    for(int i=0;str[i];i++){
+        int u=str[i]-'a';
+        if(!son[p][u]) return 0;
+        p=son[p][u];
+    }
+    return cnt[p];
+}
+
+
+int main(){
+    int n;
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        char op[2];
+        char str[N];
+        scanf("%s%s",op,str);
+        // printf("%s %s\n",op,str);
+        if(op[0]=='I') insert(str);
+        else printf("%d\n",query(str));
+    }
+    return 0;
+}
+```
+
+
+
+#### AcWing 143. 最大异或对
+
+模板题
+
+```c++
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+const int M=3e7+10;
+const int N=1e5+10;
+int son[M][2],idx;
+int a[N];
+
+void insert(int x){
+    int p=0;
+    for(int i=30;~i;i--){
+        int s=(x>>i)&1;
+        if(!son[p][s]) son[p][s]=++idx;
+        p=son[p][s];
+    }
+}
+
+int query(int x){
+    int p=0;
+    int res=0;
+    for(int i=30;~i;i--){
+        int s=(x>>i)&1;
+        if(son[p][!s]){
+            res+=1<<i;
+            p=son[p][!s];
+        }else p=son[p][s];
+    }
+    return res;
+}
+
+int main(){
+    int n;
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&a[i]);
+        insert(a[i]);
+    }
+    int res=0;
+    for(int i=0;i<n;i++){
+        res=max(res,query(a[i]));
+    }
+    printf("%d\n",res);
+    return 0;
+}
+```
+
+
+
+### 并查集
+
+#### AcWing 836. 合并集合
+
+并查集模板题
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e5+10;
+int n,m;
+int p[N];
+
+int find(int x){
+    if(p[x]!=x) p[x]=find(p[x]);
+    return p[x];
+}
+
+
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;i++) p[i]=i;
+    while(m--){
+        char op[2];
+        int a,b;
+        scanf("%s%d%d",op,&a,&b);
+        if(op[0]=='M') p[find(a)]=find(b);
+        else{
+            if(find(a)==find(b)) printf("Yes\n");
+            else printf("No\n");
+        }
+    }
+    
+    return 0;
+}
+```
+
+
+
+#### AcWing 837. 连通块中点的数量
+
+注意维护一个s数组，存放以i为根节点的点的数量，注意特判，如果c a a，自己连接自己的时候，s数组不用更新。
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e5+10;
+
+int n,m;
+//维护一个s数组，只对根节点有效
+int p[N],s[N];
+
+int find(int x){
+    if(p[x]!=x) p[x]=find(p[x]);
+    return p[x];
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;i++){
+        p[i]=i;
+        s[i]=1;  
+    } 
+    while(m--){
+        char op[3];
+        int a,b;
+        scanf("%s",op);
+        if(op[0]=='C'){
+            scanf("%d%d",&a,&b);
+            //防止自己加自己，要特判一下
+            if(find(a)!=find(b))
+                s[find(b)]+=s[find(a)];
+            p[find(a)]=find(b);
+        }else if(op[1]=='1'){
+            scanf("%d%d",&a,&b);
+            if(find(a)==find(b)) printf("Yes\n");
+            else printf("No\n");
+        }else{
+            scanf("%d",&a);
+            printf("%d\n",s[find(a)]);
+            // int x=find(a);
+            // int cnt=0;
+            // for(int i=1;i<=n;i++){
+            //     if(find(i)==x) cnt++;
+            // }
+            // printf("%d\n",cnt);
+        }
+    }
+}
+```
+
+#### AcWing 240. 食物链
+
+算是我目前为止，见过最难的题目了，自己一个人是绝对想不出来怎么解的
+
+
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e5+10;
+int p[N],d[N];
+
+int find(int x){
+    if(p[x]!=x){
+        //这个操作，可以让p[x]指向p[x]所属集和的根节点
+        int t=find(p[x]);
+        //那么这个操作就是 x->p[x]的距离d[x]，加上p[x]->根节点的距离
+        d[x]+=d[p[x]];
+        //最后更新x的父节点为所属集合的根节点
+        p[x]=t;
+    }
+    return p[x];
+}
+
+//d[x] x到x的父节点的距离，距离模3，余0（与根节点同类），余1（吃根节点），余2（被根节点吃）
+int main(){
+    int n,k;
+    scanf("%d%d",&n,&k);
+    for(int i=1;i<=n;i++) p[i]=i;
+    int res=0;
+    while(k--){
+        int op;
+        int x,y;
+        scanf("%d%d%d",&op,&x,&y);
+        if(x>n||y>n){
+            res++;
+        }else{
+           int px=find(x),py=find(y);
+           if(op==1){
+               //(d[x]-d[y])%3!=0 意味着x,y不是同类
+               if(px==py&&(d[x]-d[y])%3) res++;
+               else if(px!=py){
+                   p[px]=py;
+                   //把x,y合并为同一类，那么(d[x]+?-d[y])%3==0
+                   //解得 d[px]=d[y]-d[x]
+                   d[px]=d[y]-d[x];//有可能为负数
+               }
+           }else{
+               //不满足(d[x]-d[y]-1)%3!=0 x不可能吃y
+               if(px==py&&(d[x]-d[y]-1)%3) res++;
+               else if(px!=py){
+                   p[px]=py;
+                   //同理，需要满足x吃y,(d[x]+?-d[y]-1)%3==0
+                   //d[px]=d[y]-d[x]+1
+                   d[px]=d[y]-d[x]+1;
+               }
+           }
+        }
+    }
+    printf("%d\n",res);
+    return 0;
+}
+```
+
+
+
+### 堆
+
+#### AcWing 838. 堆排序
+
+模板题
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+int h[N],s;
+
+void down(int u){
+    int t=u;
+    if(u*2<=s&&h[u*2]<h[t]) t=u*2;
+    if(u*2+1<=s&&h[u*2+1]<h[t]) t=u*2+1;
+    if(t!=u){
+        swap(h[u],h[t]);
+        down(t);
+    }
+}
+
+int main(){
+    int n,m;
+    
+    scanf("%d%d",&n,&m);
+    s=n;
+    for(int i=1;i<=n;i++) scanf("%d",&h[i]);
+    
+    for(int i=n/2;i>=1;i--) down(i);
+    while(m--){
+        printf("%d ",h[1]);
+        h[1]=h[s];
+        s--;
+        down(1);
+    }
+    return 0;
+    
+    
+}
+```
+
+
+
+#### AcWing 839. 模拟堆
+
+我觉得这是一个比食物链还要难的题目。
+
+就是索引指来指去很烦。
+
+```c++
+#include<iostream>
+#include<string.h>
+using namespace std;
+const int N=1e5+10;
+int h[N],ph[N],hp[N],s;
+
+void heap_swap(int a,int b){
+    swap(ph[hp[a]],ph[hp[b]]);
+    swap(hp[a],hp[b]);
+    swap(h[a],h[b]);
+    
+}
+
+
+void down(int u){
+    int t=u;
+    if(2*u<=s&&h[2*u]<h[t]) t=2*u;
+    if(2*u+1<=s&&h[2*u+1]<h[t]) t=2*u+1;
+    if(t!=u){
+        heap_swap(t,u);
+        down(t);
+    }
+    
+    
+}
+
+void up(int u){
+    int t=u;
+    if(u/2&&h[u/2]>h[t]) t=u/2;
+    if(t!=u){
+        heap_swap(t,u);
+        up(t);
+    }
+}
+
+int main(){
+    int n,m=0;
+    scanf("%d",&n);
+    while(n--){
+        char op[10];
+        int k,x;
+        scanf("%s",op);
+        if(!strcmp(op,"I")){
+            scanf("%d",&x);
+            s++;
+            m++;
+            ph[m]=s;
+            hp[s]=m;
+            h[s]=x;
+            up(s);
+        }else if(!strcmp(op,"PM")){
+            printf("%d\n",h[1]);
+        }else if(!strcmp(op,"DM")){
+            heap_swap(1,s);
+            s--;    
+            down(1);
+        
+        }else if(!strcmp(op,"D")){
+            scanf("%d",&x);
+            k=ph[x];
+            heap_swap(k,s);
+            s--;
+            down(k),up(k);
+        }else{
+            scanf("%d%d",&k,&x);
+            k=ph[k];
+            h[k]=x;
+            down(k),up(k);
+        }
+    }
+    return 0;
+}
+```
+
+
+
+### 哈希表
+
+2020年8月18日
+
+#### AcWing 840. 模拟散列表
+
+拉链法解决冲突
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+const int N=100003;
+int h[N],e[N],ne[N],idx;
+
+//拉链法，用一条单链表存储映射到同一个值k的数x
+void insert(int x){
+    //x可能为负数，负数取模后还是负数，所以要+N，在对N取模
+    int k=(x%N+N)%N;
+    //单链表头插法操作
+    e[idx]=x;
+    ne[idx]=h[k];
+    h[k]=idx++;
+}
+
+bool find(int x){
+    int k=(x%N+N)%N;
+    for(int i=h[k];i!=-1;i=ne[i]){
+        if(e[i]==x) return true;
+    }
+    return false;
+}
+
+int main(){
+    
+    int n;
+    scanf("%d",&n);
+    //单链表为空时，头指针指向-1
+    memset(h,-1,sizeof(h));
+    while(n--){
+        char op[2];
+        int x;
+        scanf("%s%d",op,&x);
+        if(op[0]=='I'){
+            insert(x);
+        }else{
+            if(find(x)){
+                printf("Yes\n");
+            }else printf("No\n");
+        }
+    }
+    
+    return 0;
+}
+```
+
+开放选址法
+
+好处是只用开一个数组
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+const int N=200003,null=0x3f3f3f3f;
+int h[N];
+//开放寻址法
+
+//找到在哪里放x 
+int find(int x){
+    int k=(x%N+N)%N;
+    while(h[k]!=null&&h[k]!=x){
+        k++;
+        if(k==N) k=0;
+    }
+    return k;    
+}
+
+int main(){
+    int n;
+    memset(h,null,sizeof(h));
+    scanf("%d",&n);
+    while(n--){
+        char op[2];
+        int x;
+        scanf("%s%d",op,&x);
+        int k=find(x);
+        if(op[0]=='I'){
+            h[k]=x;
+        }else{
+           if(h[k]!=null) printf("Yes\n");
+           else printf("No\n");
+        }
+    }
+    return 0;
+}
+
+```
+
+#### AcWing 841. 字符串哈希
+
+字符串哈希模板
+
+
+
+```c++
+#include<iostream>
+typedef unsigned long long ULL;
+using namespace std;
+
+const int N=1e5+10,P=131;
+int n,m;
+char str[N];
+ULL h[N],p[N];
+
+ULL get(int l,int r){
+    return h[r]-h[l-1]*p[r-l+1];
+}
+
+int main(){
+    //为了让字符串下标从1开始
+    scanf("%d%d%s",&n,&m,str+1);
+    //预处理p数组，同时处理h数组
+    //str[i]只要不让字符等于0即可
+    p[0]=1;
+    for(int i=1;i<=n;i++){
+        p[i]=p[i-1]*P;
+        h[i]=h[i-1]*P+str[i];
+    }
+    
+    
+    while(m--){
+        int l1,r1,l2,r2;
+        scanf("%d%d%d%d",&l1,&r1,&l2,&r2);
+        if(get(l1,r1)==get(l2,r2)) puts("Yes");
+        else puts("No");
+        
+    }
+    return 0;
+}
+```
+
+
+
+### 模板
+
+#### AcWing xxx. xxxx
+
+```c++
+
+```
 
