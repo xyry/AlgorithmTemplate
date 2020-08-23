@@ -417,3 +417,72 @@ int main(){
 }
 ```
 
+## Dijkstra
+
+朴素n^2模板
+
+```c++
+//稠密图
+//标记
+bool st[N];
+//距离
+int dist[N];
+//邻接矩阵
+int g[N][N];
+int dijkstra(){
+    //初始化所有距离为正无穷
+    memset(dist,0x3f,sizeof(dist));
+    //起点到自己的距离为0
+    dist[1]=0;
+    
+    //更新n次
+    for(int i=0;i<n;i++){
+        int t=-1;
+        //找一个不在当前集合的，离起点最近的点，或者如果不存在离起点最近的点，就找一个没有访问过的点。
+        for(int j=1;j<=n;j++){
+            if(!st[j]&&(t==-1||dist[t]>dist[j]))
+                t=j;
+        }
+        
+        //打标记
+        st[t]=1;
+        for(int j=1;j<=n;j++){
+            dist[j]=min(dist[j],dist[t]+g[t][j]);
+        }
+    }
+    
+    if(dist[n]==0x3f3f3f3f) return -1;
+    else return dist[n];
+}
+```
+
+堆优化 mlogn
+
+```c++
+//堆优化版本，没事看看
+int dijkstra(){
+    memset(dist,0x3f,sizeof(dist));
+    //小根堆 从小到大排序，这种写法第一次见
+    
+    priority_queue<PII,vector<PII>,greater<PII>> heap;
+    heap.push({0,1});
+    while(heap.size()){
+        PII cur=heap.top();heap.pop();
+        int ver=cur.second;
+        int d=cur.first;
+        
+        for(int i=h[ver];i!=-1;i=ne[i]){
+            int j=e[i];
+            //更新才往堆里添加元素，不然重复添加没有意义
+            if(dist[j]>d+w[i]){
+                dist[j]=d+w[i];
+                heap.push({dist[j],j});
+            }
+        }
+    }
+    if(dist[n]==0x3f3f3f3f) return -1;
+    return dist[n];
+    
+}
+```
+

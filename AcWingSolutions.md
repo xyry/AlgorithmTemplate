@@ -1751,6 +1751,523 @@ int main(){
 }
 ```
 
+## 第三讲 搜索与图论
+
+### DFS
+
+#### AcWing 842. 排列数字
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=10;
+int path[N];
+bool vis[N];
+int n;
+void dfs(int u){
+    if(u==n){
+        for(int i=0;i<n;i++) printf("%d ",path[i]);
+        puts("");
+        return;
+    }
+    for(int i=1;i<=n;i++){
+        if(!vis[i]){
+            path[u]=i;
+            vis[i]=true;
+            dfs(u+1);
+            vis[i]=false;
+        }
+    }
+}
+
+
+int main(){
+    scanf("%d",&n);
+    dfs(0);
+    return 0;
+}
+```
+
+#### AcWing 843. n-皇后问题
+
+我遇到的问题就是，如何判断对角线上的值
+
+```c++
+#include<iostream>
+using namespace std;
+
+//因为要存对角线的元素，所以N设置为2倍大小
+const int N=20;
+char g[N][N];
+//dg[N] x+y  对角线上的值相同，手算一下就明白
+//dg[N] x-y+n
+
+bool row[N],col[N],dg[N],udg[N];
+int n;
+
+void dfs(int u){
+    if(u==n){
+        for(int i=0;i<n;i++) puts(g[i]);
+        puts("");
+        return;
+    }
+    
+    for(int i=0;i<n;i++){
+        if(!col[i]&&!dg[u+i]&&!udg[u-i+n]){
+            g[u][i]='Q';
+            row[u]=true;
+            col[i]=true;
+            dg[u+i]=true;
+            udg[u-i+n]=true;
+            dfs(u+1);
+            g[u][i]='.';
+            row[u]=false;
+            col[i]=false;
+            dg[u+i]=false;
+            udg[u-i+n]=false;
+        }
+    }
+}
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            g[i][j]='.';
+        }
+    }
+    dfs(0);
+    return 0;
+}
+```
+
+### BFS
+
+#### AcWing 844. 走迷宫
+
+典型BFS裸题
+
+```c++
+#include<iostream>
+#include<queue>
+
+using namespace std;
+
+const int N=110;
+int g[N][N];
+int n,m;
+bool vis[N][N];
+struct node{
+    int x,y;
+    int cnt;
+};
+int d[4][2]={{0,-1},{0,1},{-1,0},{1,0}};
+
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            scanf("%d",&g[i][j]);
+        }
+    }
+    node start;
+    start.x=0;
+    start.y=0;
+    start.cnt=0;
+    vis[0][0]=1;
+    queue<node> q;
+    q.push(start);
+    while(!q.empty()){
+        node cur=q.front();
+        q.pop();
+        int cx=cur.x;
+        int cy=cur.y;
+        int cn=cur.cnt;
+        // cout<<cx<<","<<cy<<","<<cn<<endl;
+        if(cx==n-1&&cy==m-1){
+            printf("%d\n",cn);
+            break;
+        } 
+        node t;
+        for(int i=0;i<4;i++){
+            t.x=cx+d[i][0];
+            t.y=cy+d[i][1];
+            t.cnt=cn+1;
+            if(t.x>=0&&t.x<n&&t.y>=0&&t.y<m&&g[t.x][t.y]==0&&!vis[t.x][t.y]){
+                vis[t.x][t.y]=1;
+                q.push(t);
+            }
+        }
+    }
+    
+    
+    
+    return 0;
+}
+```
+
+#### AcWing 845. 八数码
+
+难点，用字符串存储状态，然后模拟x与周围数字交换即可，
+
+```c++
+#include<iostream>
+#include<queue>
+#include<unordered_map>
+using namespace std;
+
+int d[4][2]={{0,-1},{0,1},{1,0},{-1,0}};
+
+int bfs(string start){
+    queue<string> q;
+    string end="12345678x";
+    unordered_map<string,int> dis;
+    dis[start]=0;
+    q.push(start);
+    while(q.size()){
+        string cur=q.front();q.pop();
+        int dc=dis[cur];
+        if(cur==end) return dc;
+        int k=cur.find('x');
+        int x=k/3,y=k%3;
+        for(int i=0;i<4;i++){
+            int nx=x+d[i][0];
+            int ny=y+d[i][1];
+            if(nx>=0&&nx<3&&ny>=0&&ny<3){
+                swap(cur[k],cur[nx*3+ny]);
+                if(!dis.count(cur)){
+                    dis[cur]=dc+1;
+                    q.push(cur);
+                }
+                swap(cur[k],cur[nx*3+ny]);
+            }
+        }
+        
+    }
+    return -1;
+}
+
+int main(){
+    string start;
+    for(int i=0;i<9;i++){
+        char c;
+        cin>>c;
+        start+=c;
+    }
+    // cout<<start;
+    cout<<bfs(start)<<endl;
+    return 0;
+}
+```
+
+### 树与图的深度优先遍历
+
+#### AcWing 846. 树的重心
+
+需要理解一点
+
+这里是枚举删除每个点，然后计算删除每个点之后，剩余各个连通块中的节点数量，连通块有两种：各个子树，父节点所在的连通块，各个子树中的节点数量，就是子节点dfs的返回值；父节点所在连通块中点的数量，就是总数减去当前整棵子树的节点数。搞明白这一点就容易理解这道题目的做法了。
+
+```c++
+#include<iostream>
+#include<string.h>
+using namespace std;
+const int N=1e5+10,M=2*N;
+int h[N],e[M],ne[M],idx;
+bool vis[N];
+int ans=N;
+
+int n;
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+int dfs(int u){
+    int res=0;
+    int sum=1;
+    vis[u]=1;
+    for(int i=h[u];i!=-1;i=ne[i]){
+        //注意记得用e[]数组把图中的点解出来，不然看半天都不知道哪里写错了，因为e[]索引是idx，每个点的唯一标识，e[idx]才是图中的某个节点值
+        int j=e[i];
+        if(!vis[j]){
+            int s=dfs(j);
+            res=max(res,s);
+            sum+=s;
+        }
+    }
+    //n-sum其实就是父节点所在连通块的点数，为什么呢，因为从父节点下来，父节点的vis[j]是打上了标记的，所以sum是不包含父节点所在连通块的点数的，所以这样做是正确的。
+    res=max(res,n-sum);
+    ans=min(res,ans);
+    return sum;
+}
+
+int main(){
+    scanf("%d",&n);
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<n-1;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        add(a,b);
+        add(b,a);
+    }
+    dfs(1);
+    printf("%d\n",ans);
+    return 0;
+}
+```
+
+#### AcWing 847. 图中点的层次
+
+不得不说，我最拿手的还是BFS，深搜对我来说很费劲，但是BFS贼溜
+
+```c++
+#include<string.h>
+#include<iostream>
+#include<queue>
+using namespace std;
+typedef pair<int,int> PII;
+const int N=1e5+10,M=2*N;
+int h[N],e[M],ne[M],idx;
+bool vis[N];
+int n,m;
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<m;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        add(a,b);
+    }
+    queue<PII> q;
+    vis[1]=1;
+    q.push(make_pair(1,0));
+    while(q.size()){
+        PII cur=q.front();q.pop();
+        int cid=cur.first;
+        int cd=cur.second;
+        if(cid==n){
+            printf("%d\n",cd);
+            return 0;
+        }
+        for(int i=h[cid];i!=-1;i=ne[i]){
+            int j=e[i];
+            if(!vis[j]){
+                q.push(make_pair(j,cd+1));
+                vis[j]=1;
+            }
+        }
+    }
+    printf("-1\n");
+    return 0;
+}
+```
+
+### 拓扑排序
+
+#### AcWing 848. 有向图的拓扑序列
+
+找入度为0的点，加入队列。
+
+每次挑出一个点，就把该点连的点入度全部减去1。
+
+```c++
+#include<iostream>
+#include<string.h>
+const int N=1e5+10,M=2*N;
+int h[N],e[M],ne[M],idx;
+int rd[N],q[N];
+using namespace std;
+int n,m;
+int hh,tt=-1;
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+bool topsort(){
+    hh=0,tt=-1;
+    for(int i=1;i<=n;i++){
+        if(rd[i]==0){
+            q[++tt]=i;
+        }
+    }
+    while(hh<=tt){
+        int cur=q[hh++];
+        for(int i=h[cur];i!=-1;i=ne[i]){
+            int j=e[i];
+            rd[j]--;
+            if(rd[j]==0) q[++tt]=j;
+        }
+    }
+    return tt==n-1;
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<m;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        add(a,b);
+        rd[b]++;
+    }
+    if(topsort()){
+        for(int i=0;i<n;i++){
+            printf("%d ",q[i]);
+        }
+        puts("");
+    }else{
+        printf("-1\n");
+    }
+    return 0;
+}
+```
+
+### Dijkstra
+
+#### AcWing 849. Dijkstra求最短路I
+
+模板
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+//500 个点，1e5条边 稠密图，用邻接矩阵
+const int N=510;
+int g[N][N];
+int dist[N];
+bool st[N];
+int n,m;
+
+int dijkstra(){
+    //初始化所有距离为正无穷
+    memset(dist,0x3f,sizeof(dist));
+    //起点到自己的距离为0
+    dist[1]=0;
+    
+    //更新n次
+    for(int i=0;i<n;i++){
+        int t=-1;
+        //找一个不在当前集合的，离起点最近的点，或者如果不存在离起点最近的点，就找一个没有访问过的点。
+        for(int j=1;j<=n;j++){
+            if(!st[j]&&(t==-1||dist[t]>dist[j]))
+                t=j;
+        }
+        
+        //打标记
+        st[t]=1;
+        for(int j=1;j<=n;j++){
+            dist[j]=min(dist[j],dist[t]+g[t][j]);
+        }
+    }
+    
+    if(dist[n]==0x3f3f3f3f) return -1;
+    else return dist[n];
+    
+    
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(g,0x3f,sizeof(g));
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        //去掉重边，取值最小的那条边
+        g[a][b]=min(g[a][b],c);
+    }
+    int t=dijkstra();
+    printf("%d\n",t);
+    
+    return 0;
+}
+
+```
+
+#### AcWing 850. Dijkstra求最短路II
+
+堆优化版本Dijkstra，时间复杂度 mlogm
+
+
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+#include<queue>
+using namespace std;
+typedef pair<int,int> PII;
+const int N=2e5+10;
+//使用邻接表进行存储
+int h[N],e[N],ne[N],w[N],idx;
+int dist[N];
+bool st[N];
+int n,m;
+
+
+void add(int a,int b,int c){
+    e[idx]=b;
+    //存储了一个权重
+    w[idx]=c;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+int dijkstra(){
+    memset(dist,0x3f,sizeof(dist));
+    //小根堆 从小到大排序，这种写法第一次见
+    
+    priority_queue<PII,vector<PII>,greater<PII>> heap;
+    heap.push({0,1});
+    while(heap.size()){
+        PII cur=heap.top();heap.pop();
+        int ver=cur.second;
+        int d=cur.first;
+        
+        for(int i=h[ver];i!=-1;i=ne[i]){
+            int j=e[i];
+            //更新才往堆里添加元素，不然重复添加没有意义
+            if(dist[j]>d+w[i]){
+                dist[j]=d+w[i];
+                heap.push({dist[j],j});
+            }
+        }
+    }
+    if(dist[n]==0x3f3f3f3f) return -1;
+    return dist[n];
+    
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        add(a,b,c);
+    }
+    int t=dijkstra();
+    printf("%d\n",t);
+    return 0;
+}
+```
+
 
 
 ### 模板
