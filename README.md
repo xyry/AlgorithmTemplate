@@ -419,7 +419,9 @@ int main(){
 
 ## Dijkstra
 
-朴素n^2模板
+单源最短路径
+
+### 朴素n^2模板
 
 ```c++
 //稠密图
@@ -456,7 +458,7 @@ int dijkstra(){
 }
 ```
 
-堆优化 mlogn
+### 堆优化 mlogn
 
 ```c++
 //堆优化版本，没事看看
@@ -483,6 +485,206 @@ int dijkstra(){
     if(dist[n]==0x3f3f3f3f) return -1;
     return dist[n];
     
+}
+```
+
+## Bellman-Ford
+
+如果存在负权环，最短路不一定存在。也就是说一个环的长度加起来是个负数，这样从起点可能走不到终点。
+
+要经常看下这个算法，松弛操作。
+
+```c++
+const int N=510,M=1e4+10;
+int n,m,k;
+int dist[N],backup[N];
+struct Edge{
+    int a,b,w;
+}edges[M];
+
+int bellman_ford(){
+    //距离数组初始化
+    memset(dist,0x3f,sizeof dist);
+    dist[1]=0;
+    //更新k次，可以获得一条有k条边的最短路径。
+    for(int i=0;i<k;i++){
+        //为了防止串联更新，因为每一次只更新一条边
+        memcpy(backup,dist,sizeof(dist));
+        for(int j=0;j<m;j++){
+            int a=edges[j].a;
+            int b=edges[j].b;
+            int w=edges[j].w;
+            dist[b]=min(dist[b],backup[a]+w);
+        }
+    }
+    //假设1-n没有路径，但是n-1 ->n 有一条-2的边权，那么dist[n]也会被更新成inf-2，所以要这样去判定1-n是否有路径
+    //每一次边权绝对值10000，k最大500，所以dist[n]经历过负边权最小为inf-5e6 如果inf大于这个值，说明1->n没有路径
+    if(dist[n]>0x3f3f3f3f/2) return -1;
+    return dist[n];
+}
+```
+
+## SPFA
+
+### 标准模板
+
+和堆优化dijkstra很像
+
+```C++
+//因为是稀疏图，这里用的邻接表存储
+//st代表该点是否在队列中，如果在就不往里面添加。
+int spfa(){
+    //初始化
+    memset(dist,0x3f,sizeof(dist));
+    dist[1]=0;
+    
+    queue<int> q;
+    q.push(1);
+    st[1]=1;
+    while(q.size()){
+        int cur=q.front();
+        q.pop();
+        st[cur]=0;
+        for(int i=h[cur];i!=-1;i=ne[i]){
+            int j=e[i];
+            if(dist[j]>dist[cur]+w[i]){
+                dist[j]=dist[cur]+w[i];
+                if(!st[j]){
+                    q.push(j);
+                    st[j]=1;
+                }
+            }
+        }
+        
+    }
+    
+    //这种情况就直接判定等于了，因为在后面的点不会被更新到，和bellman-ford不一样
+    if(dist[n]==0x3f3f3f3f) return -1;
+    return dist[n];
+}
+```
+
+### 判负环
+
+```c++
+bool spfa(){
+    //不需要初始化，因为我们不算最短距离，只判负环，遇到负权才会更新距离
+    queue<int> q;
+    //从1开始的路径可能没有负环，所以要把每个点都加到队列中，进行判断
+    for(int i=1;i<=n;i++){
+        st[i]=1;
+        q.push(i);
+    }
+    while(q.size()){
+        int cur=q.front();q.pop();
+        st[cur]=0;
+        for(int i=h[cur];i!=-1;i=ne[i]){
+            int j=e[i];
+            if(dist[j]>dist[cur]+w[i]){
+                dist[j]=dist[cur]+w[i];
+                cnt[j]=cnt[cur]+1;
+                if(cnt[j]>=n) return true;
+                if(!st[j]){
+                    st[j]=1;
+                    q.push(j);
+                }
+            }
+        }
+    }
+    return false;
+    
+}
+```
+
+## Floyd
+
+多源最短路径
+
+```c++
+//初始化的时候
+for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            if(i==j) d[i][j]=0;
+            else d[i][j]=INF;
+        }
+    }
+for(int i=1;i<=m;i++){
+    int a,b,w;
+    scanf("%d%d%d",&a,&b,&w);
+    //这样更新，可以去掉自环，和重边（取两个点之间最近的那一条边）
+    d[a][b]=min(d[a][b],w);
+}
+void floyd(){
+    for(int k=1;k<=n;k++){
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=n;j++){
+                d[i][j]=min(d[i][j],d[i][k]+d[k][j]);
+            }
+        }
+    }
+}
+
+```
+
+## Prim
+
+```c++
+//g数组初始化
+memset(g,INF,sizeof g);
+int prim(){
+    memset(dist,0x3f,sizeof dist);
+    
+    for(int i=0;i<n;i++){
+        int t=-1;
+        for(int j=1;j<=n;j++){
+            if(!st[j]&&(t==-1||dist[t]>dist[j])){
+                t=j;
+            }
+        }
+        st[t]=1;
+        //不是第一个点，但是找到的离当前集合最小的点距离为INF，证明该图不连通
+        if(i&&dist[t]==INF) return INF;
+        //不是第一个点，找到离当前集合最近的距离，加上去，因为一个点没有边
+        if(i) res+=dist[t];
+        //重新更新集和外的点到集合里点的距离
+        //与dijkstra算法的区别，dijkstra更新每个点到源点的距离，prim更新每个点到集合的最短距离。
+        for(int j=1;j<=n;j++) dist[j]=min(dist[j],g[t][j]);
+    
+    }
+}
+```
+
+## Kruskal
+
+求最小生成树算法，对所有边排序，每次加入一条最短的边，（prim算法是每次加入一个点），利用并查集来做，如果最后加入了n-1条边，那么这n个点是连通的。
+
+## 二分图
+
+二分图当且仅当图中不含奇数环，（有奇数条边的环，因为会推出矛盾）。
+
+由于图中不含奇数环，所以染色过程中一定没有矛盾。
+
+## 匈牙利算法
+
+二分图的最大匹配，递归思想。
+
+```c++
+bool find(int x){
+    for(int i=h[x];i!=-1;i=ne[i]){
+        int j=e[i];
+        //如果当前点没有标记，这个标记不等于匹配，主要是为了递归找的时候用的
+        if(!st[j]){
+            //看上当前点
+            st[j]=true;
+            //如果右边点没有匹配，或者可以通过递归让其空出来
+            if(match[j]==0||find(match[j])){
+                match[j]=x;
+                return true;
+            }
+        }
+        
+    }
+    return false;
 }
 ```
 

@@ -2268,6 +2268,489 @@ int main(){
 }
 ```
 
+### Bellman_ford
+
+n^2
+
+#### AcWing 855. 有边数限制的最短路
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+const int N=510,M=1e4+10;
+int n,m,k;
+int dist[N],backup[N];
+struct Edge{
+    int a,b,w;
+}edges[M];
+
+int bellman_ford(){
+    //距离数组初始化
+    memset(dist,0x3f,sizeof dist);
+    dist[1]=0;
+    //更新k次，可以获得一条有k条边的最短路径。
+    for(int i=0;i<k;i++){
+        //为了防止串联更新，因为每一次只更新一条边
+        memcpy(backup,dist,sizeof(dist));
+        for(int j=0;j<m;j++){
+            int a=edges[j].a;
+            int b=edges[j].b;
+            int w=edges[j].w;
+            dist[b]=min(dist[b],backup[a]+w);
+        }
+    }
+    //假设1-n没有路径，但是n-1 ->n 有一条-2的边权，那么dist[n]也会被更新成inf-2，所以要这样去判定1-n是否有路径
+    //每一次边权绝对值10000，k最大500，所以dist[n]经历过负边权最小为inf-5e6 如果inf大于这个值，说明1->n没有路径
+    if(dist[n]>0x3f3f3f3f/2) return -1;
+    return dist[n];
+}
+
+
+int main(){
+    scanf("%d%d%d",&n,&m,&k);
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        edges[i]={a,b,c};
+    }
+    int t=bellman_ford();
+    if(t==-1) puts("impossible");
+    else printf("%d\n",t);
+    return 0;
+}
+```
+
+### SPFA
+
+和堆优化dijkstra特别相似
+
+#### AcWing 851. spfa求最短路
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<queue>
+
+using namespace std;
+
+const int N=1e5+10;
+int h[N],e[N],ne[N],w[N],idx;
+int dist[N];
+bool st[N];
+int n,m;
+
+void add(int a,int b,int c){
+    e[idx]=b;
+    w[idx]=c;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+int spfa(){
+    //初始化
+    memset(dist,0x3f,sizeof(dist));
+    dist[1]=0;
+    
+    queue<int> q;
+    q.push(1);
+    st[1]=1;
+    while(q.size()){
+        int cur=q.front();
+        q.pop();
+        st[cur]=0;
+        for(int i=h[cur];i!=-1;i=ne[i]){
+            int j=e[i];
+            if(dist[j]>dist[cur]+w[i]){
+                dist[j]=dist[cur]+w[i];
+                if(!st[j]){
+                    q.push(j);
+                    st[j]=1;
+                }
+            }
+        }
+        
+    }
+    
+    //这种情况就直接判定等于了，因为在后面的点不会被更新到，和bellman-ford不一样
+    if(dist[n]==0x3f3f3f3f) return -1;
+    return dist[n];
+}
+
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(h,-1,sizeof h);
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        add(a,b,c);
+    }
+    int t=spfa();
+    if(t==-1) puts("impossible");
+    else printf("%d\n",t);
+    return 0;
+}
+```
+
+
+
+#### AcWing 852. spfa判断负环
+
+
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<queue>
+using namespace std;
+
+const int N=1e4+10;
+int h[N],e[N],ne[N],idx,w[N];
+bool st[N];
+int dist[N],cnt[N];
+int n,m;
+
+void add(int a,int b,int c){
+    e[idx]=b;
+    w[idx]=c;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+bool spfa(){
+    //不需要初始化，因为我们不算最短距离，只判负环，遇到负权才会更新距离
+    queue<int> q;
+    //从1开始的路径可能没有负环，所以要把每个点都加到队列中，进行判断
+    for(int i=1;i<=n;i++){
+        st[i]=1;
+        q.push(i);
+    }
+    while(q.size()){
+        int cur=q.front();q.pop();
+        st[cur]=0;
+        for(int i=h[cur];i!=-1;i=ne[i]){
+            int j=e[i];
+            if(dist[j]>dist[cur]+w[i]){
+                dist[j]=dist[cur]+w[i];
+                cnt[j]=cnt[cur]+1;
+                if(cnt[j]>=n) return true;
+                if(!st[j]){
+                    st[j]=1;
+                    q.push(j);
+                }
+            }
+        }
+    }
+    return false;
+    
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    //单链表必须要初始化h数组，不然死循环，TLE
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        add(a,b,c);
+    }
+    if(spfa()) puts("Yes");
+    else puts("No");
+    return 0;
+}
+
+```
+
+### Floyd
+
+#### AcWing 854. Floyd求最短路
+
+多源最短路径
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+const int N=210,INF=1e9;
+int d[N][N];
+int n,m,Q;
+
+void floyd(){
+    for(int k=1;k<=n;k++){
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=n;j++){
+                d[i][j]=min(d[i][j],d[i][k]+d[k][j]);
+            }
+        }
+    }
+}
+
+
+int main(){
+    scanf("%d%d%d",&n,&m,&Q);
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            if(i==j) d[i][j]=0;
+            else d[i][j]=INF;
+        }
+    }
+    for(int i=1;i<=m;i++){
+        int a,b,w;
+        scanf("%d%d%d",&a,&b,&w);
+        //这样更新，可以去掉自环，和重边（取两个点之间最近的那一条边）
+        d[a][b]=min(d[a][b],w);
+    }
+    floyd();
+    while(Q--){
+        int x,y;
+        scanf("%d%d",&x,&y);
+        //存在负权边，所以距离为inf也会被更新
+        if(d[x][y]>INF/2) puts("impossible");
+        else printf("%d\n",d[x][y]);
+    }
+    return 0;
+}
+```
+
+### Prim
+
+#### AcWing 858. Prim算法求最小生成树
+
+模板题
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+const int N=510,INF=0x3f3f3f3f;
+int g[N][N],dist[N];
+bool st[N];
+int n,m;
+int res;
+
+int prim(){
+    memset(dist,0x3f,sizeof dist);
+    
+    for(int i=0;i<n;i++){
+        int t=-1;
+        for(int j=1;j<=n;j++){
+            if(!st[j]&&(t==-1||dist[t]>dist[j])){
+                t=j;
+            }
+        }
+        st[t]=1;
+        //不是第一个点，但是找到的离当前集合最小的点距离为INF，证明该图不连通
+        if(i&&dist[t]==INF) return INF;
+        //不是第一个点，找到离当前集合最近的距离，加上去，因为一个点没有边
+        if(i) res+=dist[t];
+        //重新更新集和外的点到集合里点的距离
+        //与dijkstra算法的区别，dijkstra更新每个点到源点的距离，prim更新每个点到集合的最短距离。
+        for(int j=1;j<=n;j++) dist[j]=min(dist[j],g[t][j]);
+    
+    }
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(g,INF,sizeof g);
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        //去掉重边
+        g[a][b]=g[b][a]=min(g[a][b],c);
+    }
+    int t=prim();
+    if(t==INF) puts("impossible");
+    else printf("%d\n",res);
+    
+    return 0;
+}
+```
+
+### Kruskal
+
+#### AcWing 859. Kruskal 求最小生成树
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=2e5+10;
+struct Edge{
+    int a,b,w;
+    bool operator < (const Edge& W)const{
+        //从小排序，当前值比其他值小，排前面
+        return w<W.w;
+    }
+}edges[N];
+int p[N];
+int n,m;
+
+int find(int x){
+    if(p[x]!=x) p[x]=find(p[x]);
+    return p[x];
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=0;i<m;i++){
+        int a,b,c;
+        scanf("%d%d%d",&a,&b,&c);
+        edges[i]={a,b,c};
+    }
+    //并查集的初始化
+    for(int i=1;i<=n;i++) p[i]=i;
+    //对所有边排序
+    sort(edges,edges+m);
+    int res=0;
+    //加入边的个数
+    int cnt=0;
+    for(int i=0;i<m;i++){
+        int a=edges[i].a,b=edges[i].b,w=edges[i].w;
+        a=find(a);
+        b=find(b);
+        //a和b不在同一个连通块
+        if(a!=b){
+            //加入一条边，权重+w,次数+1，合并两个点
+            res+=w;
+            cnt++;
+            p[b]=a;
+        }
+    }
+    if(cnt<n-1) puts("impossible");
+    else printf("%d\n",res);
+    
+    
+    return 0;
+}
+```
+
+###  染色法判定二分图
+
+#### AcWing 860. 染色法判定二分图
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=1e5+10,M=2*N;
+int n,m;
+int h[N],e[M],ne[M],idx;
+int color[N];
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+bool dfs(int u,int c){
+    color[u]=c;
+    for(int i=h[u];i!=-1;i=ne[i]){
+        int j=e[i];
+        if(!color[j]){
+            dfs(j,3-c);
+        }else if(color[j]==c) return false;
+    }
+    return true;
+}
+
+int main(){
+    scanf("%d%d",&n,&m);
+    memset(h,-1,sizeof h);
+    for(int i=0;i<m;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        add(a,b);
+        add(b,a);
+    }
+    bool f=false;
+    for(int i=1;i<=n;i++){
+        if(!color[i]){
+            if(!dfs(i,1)){
+                puts("No");
+                f=true;
+                break;
+            }
+        }
+    }
+    if(!f) puts("Yes");
+    
+    return 0;
+}
+```
+
+### 匈牙利算法
+
+yxc讲的很有意思
+
+#### AcWing 861. 二分图的最大匹配
+
+```c++
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+//虽然是稠密图，但是我们只考虑集合1中的点，也就是只考虑a指向b，所以用邻接表存储是合适的。
+const int N=510,M=1e5+10;
+int n1,n2,m;
+int h[N],e[M],ne[M],idx;
+int match[N];
+bool st[N];
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+bool find(int x){
+    for(int i=h[x];i!=-1;i=ne[i]){
+        int j=e[i];
+        //如果当前点没有标记，这个标记不等于匹配，主要是为了递归找的时候用的
+        if(!st[j]){
+            //看上当前点
+            st[j]=true;
+            //如果右边点没有匹配，或者可以通过递归让其空出来
+            if(match[j]==0||find(match[j])){
+                match[j]=x;
+                return true;
+            }
+        }
+        
+    }
+    return false;
+}
+
+int main(){
+    scanf("%d%d%d",&n1,&n2,&m);
+    memset(h,-1,sizeof(h));
+    for(int i=0;i<m;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        add(a,b);
+    }
+    int res=0;
+    for(int i=1;i<=n1;i++){
+        //每个左边点都要把所其连接的右边点考虑一下，所以要全部置为false
+        memset(st,false,sizeof(st));
+        if(find(i)) res++;
+    }
+    printf("%d\n",res);
+    return 0;
+}
+```
+
 
 
 ### 模板
