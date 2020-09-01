@@ -688,3 +688,70 @@ bool find(int x){
 }
 ```
 
+## 筛质数
+
+1. 朴素筛法，筛所有数的倍数，$O(nlogn)$复杂度
+   $$
+   \frac{n}{2}+\frac{n}{3}+\cdots+\frac{n}{n}=n(\frac{1}{2}+\frac{1}{3}+\cdots+1)=n\ln n \le n\log n
+   $$
+   
+
+2. 埃式筛法，只筛质数的倍数，$O(n \log \log n)$
+
+3. 线性筛法，确保每个数只被筛一次，n=1e7的时候，速度比埃式筛法快一倍，因为埃式筛法中有的数被筛了好几次，比如6，被2筛过，被3也筛过，n只会被它的最小质因子筛掉
+
+### 朴素筛法
+
+### 埃式筛法
+
+```c++
+int get_prime(int n){
+   for(int i=2;i<=n;i++){
+       if(!st[i]){
+           prime[cnt++]=i;
+           for(int j=i+i;j<=n/j;j+=i){
+               st[i]=1;
+           }
+       }
+   }
+}
+
+```
+
+
+
+### 线性筛法
+
+```c++
+int get_prime(int n){
+   for(int i=2;i<=n;i++){
+       if(!st[i]){
+           prime[cnt++]=i;
+       }
+       for(int j=0;prime[j]<=n/i;j++){
+           st[prime[j]*i]=1;
+           if(i%prime[j]==0) break;// prime[j]是i的最小质因子的时候 退出循环
+       }
+   }
+}
+
+```
+
+## 尼姆博弈
+
+给定n堆石子，两位玩家轮流操作，每次操作可以从任意一堆石子中拿走任意数量的石子（可以拿完，但不能不拿），最后无法进行操作的人视为失败。问如果两人都采用最优策略，先手是否必胜。异或操作$\oplus$，以下是一个必败状态
+$$
+a_1 \oplus a_2 \oplus \cdots \oplus a_n=0
+$$
+所以当某个状态为
+$$
+a_1 \oplus a_2 \oplus \cdots \oplus a_n=x \ne0
+$$
+的时候，我们设x的二进制表示中最高一位1在第k位，那么a1,...,an中必有一个数的第k位也为1（反证），我们设该数为ai，那么ai ^ x，ai的第k位1就变成了0，所以 $a_i\oplus x<a_i$，进一步 $a_i-a_i\oplus x >0$，再进一步，我们从$a_i$这一堆石子中一定可以拿掉 $a_i-a_i\oplus x$个石子，那么这一堆石子剩下的数量就变成了$a_i-(a_i-(a_i\oplus x))=a_i\oplus x$，带入到当前状态，
+$$
+a_1 \oplus a_2 \oplus \cdots\oplus a_i\oplus x\oplus\cdots \oplus a_n=x\oplus x=0
+$$
+这样，就把当前状态变成了必败状态。
+
+必败状态指当前这个人遇到该状态无论怎么操作，都会输。所以要想赢，就把当前状态操作为必败状态。
+

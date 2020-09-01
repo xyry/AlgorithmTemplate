@@ -2751,6 +2751,257 @@ int main(){
 }
 ```
 
+## 第四讲 数学知识
+
+### 质数
+
+#### AcWing 866. 试除法判定质数
+
+就和方法名字一样，试除即可
+
+```c++
+#include<iostream>
+using namespace std;
+int n;
+
+bool isprime(int x){
+    if(x==1) return false; 
+    for(int i=2;i*i<=x;i++){
+        if(x%i==0) return false;
+    }
+    return true;
+}
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int x;
+        scanf("%d",&x);
+        if(isprime(x)){
+            puts("Yes");
+        }else puts("No");
+        
+    }
+    return 0;
+}
+```
+
+#### AcWing 867. 分解质因数
+
+同样利用试除法，n为2的k次幂时，复杂度最好是$log(n)$，最坏是$\sqrt n$
+
+```c++
+#include<iostream>
+using namespace std;
+
+int n;
+
+void divide(int n){
+    for(int i=2;i<=n/i;i++){
+        if(n%i==0){
+            int s=0;
+            while(n%i==0){
+                n/=i;
+                s++;
+            }
+            printf("%d %d\n",i,s);
+        }
+    }
+    if(n>1) printf("%d %d\n",n,1);
+    puts("");
+}
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int q;
+        scanf("%d",&q);
+        divide(q);
+    }
+    return 0;
+}
+```
+
+#### AcWing 868. 筛质数
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1e6+10;
+//false 为质数 true 为合数
+int prime[N],cnt;
+int n;
+bool st[N];
+//埃式筛法，只筛质数的倍数
+//朴素筛法，筛掉所有数的倍数
+//线性筛
+int get_prime(int n){
+   for(int i=2;i<=n;i++){
+       if(!st[i]){
+           prime[cnt++]=i;
+       }
+       for(int j=0;prime[j]<=n/i;j++){
+           st[prime[j]*i]=1;
+           if(i%prime[j]==0) break;// prime[j]是i的最小质因子的时候 退出循环
+       }
+   }
+}
+
+int main(){
+    scanf("%d",&n);
+    get_prime(n);
+    printf("%d\n",cnt);
+    return 0;
+}
+```
+
+## 博弈论
+
+#### AcWing 891. Nim游戏
+
+```c++
+#include<iostream>
+using namespace std;
+int n;
+int main(){
+    scanf("%d",&n);
+    int res;
+    for(int i=0;i<n;i++){
+        int x;
+        scanf("%d",&x);
+        if(!i) res=x;
+        else res^=x;
+    }
+    if(!res) puts("No");
+    else puts("Yes");    
+    return 0;
+}
+```
+
+#### AcWing 892. 台阶-Nim博弈
+
+我其实不太懂这是如何推导的
+
+```c++
+#include<iostream>
+using namespace std;
+
+int main(){
+    int n;
+    scanf("%d",&n);
+    int res;
+    for(int i=0;i<n;i++){
+        int x;
+        scanf("%d",&x);
+        if(!i) res=x;
+        else if(i%2==0){
+            res^=x;
+        }
+    }
+    if(res==0) puts("No");
+    else puts("Yes");
+    return 0;
+}
+```
+
+
+
+#### AcWing 893. 集合-Nim博弈
+
+SG函数 ，所有状态的SG函数异或为0，是必败状态
+
+
+
+```c++
+#include<iostream>
+#include<cstring>
+#include<unordered_set>
+using namespace std;
+const int N=110,M=1e4+10;
+int f[M];
+int a[N];
+int n,k;
+
+int sg(int x){
+    if(f[x]!=-1) return f[x];
+    unordered_set<int> S;
+    for(int i=0;i<k;i++){
+        if(x>=a[i]) S.insert(sg(x-a[i]));
+    }
+    //mex操作
+    for(int i=0;;i++){
+        if(!S.count(i)) return f[x]=i;
+    }
+}
+
+int main(){
+    cin>>k;
+    for(int i=0;i<k;i++){
+        cin>>a[i];
+    }
+    int res=0;
+    memset(f,-1,sizeof f);
+    cin>>n;
+    for(int i=0;i<n;i++){
+        int x;
+        cin>>x;
+        res^=sg(x);
+    }
+    if(res) puts("Yes");
+    else puts("No");
+    return 0;
+}
+```
+
+
+
+#### AcWing 894. 拆分-Nim博弈
+
+用到一个性质 sg(b1,b2)=sg(b1)^sg(b2);
+
+```c++
+#include<iostream>
+#include<cstring>
+#include<unordered_set>
+using namespace std;
+const int N=110;
+int f[N];
+int n;
+
+int sg(int x){
+    if(f[x]!=-1) return f[x];
+    unordered_set<int> S;
+    for(int i=0;i<x;i++){
+        for(int j=0;j<=i;j++){
+            S.insert(sg(i)^sg(j));
+        }
+    }
+    //mex操作
+    for(int i=0;;i++){
+        if(!S.count(i)){
+            return f[x]=i;
+        }
+    }
+}
+
+int main(){
+    cin>>n;
+    int res=0;
+    //记忆化搜索初始化
+    memset(f,-1,sizeof f);
+    for(int i=0;i<n;i++){
+        int x;
+        cin>>x;
+        res^=sg(x);
+    }
+    //SG值全部异或为0是必败局面
+    if(res) puts("Yes");
+    else puts("No");
+    return 0;
+}
+```
+
 
 
 ### 模板
