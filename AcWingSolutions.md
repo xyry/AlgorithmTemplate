@@ -4,7 +4,7 @@ AcWing 做题记录
 
 # 算法基础课
 
-## 基础算法
+## 第一讲 基础算法
 
 ### 排序
 
@@ -836,7 +836,7 @@ int main(){
 }
 ```
 
-## 数据结构
+## 第二讲 数据结构
 
 ### 单链表
 
@@ -2856,7 +2856,7 @@ int main(){
 }
 ```
 
-## 博弈论
+### 博弈论
 
 #### AcWing 891. Nim游戏
 
@@ -2998,6 +2998,127 @@ int main(){
     //SG值全部异或为0是必败局面
     if(res) puts("Yes");
     else puts("No");
+    return 0;
+}
+```
+
+## 第五讲 动态规划
+
+### 背包问题
+
+#### AcWing 2. 01背包问题
+
+```c++
+const int N=1100;
+int v[N],w[N];
+int f[N][N];
+
+//n^2 做法
+int main(){
+    int n,V;
+    cin>>n>>V;
+    for(int i=1;i<=n;i++){
+        cin>>v[i]>>w[i];
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=0;j<=V;j++){  
+            f[i][j]=f[i-1][j];
+            if(j>=v[i]){
+                f[i][j]=max(f[i][j],f[i-1][j-v[i]]+w[i]);
+            }
+        }
+    }
+    int res=0;
+    for(int i=1;i<=V;i++) res=max(res,f[n][i]);
+    cout<<res<<endl;
+    return 0;
+}
+*/
+```
+
+$O(V)$时间复杂度做法
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1010;
+int f[N];
+int v[N],w[N];
+int main(){
+    int n,m;
+    cin>>n>>m;
+    for(int i=1;i<=n;i++){
+        cin>>v[i]>>w[i];
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=m;j>=v[i];j--){
+            //倒着枚举 确保这个时候的f[j-v[i]]是上一个i-1的状态
+            //如果正向枚举，这个时候的f[j-v[i]]其实是当前i的状态，自己更新自己的那种感觉，你明白吧。
+            f[j]=max(f[j],f[j-v[i]]+w[i]);
+        }
+    }
+    cout<<f[m]<<endl;
+    return 0;
+}
+```
+
+#### AcWing 3. 完全背包问题
+
+
+
+```c++
+//二维版本
+#include<iostream>
+
+using namespace std;
+const int N=1010;
+int f[N][N];
+int v[N],w[N];
+int n,m;
+
+int main(){
+    cin>>n>>m;
+    for(int i=1;i<=n;i++){
+        cin>>v[i]>>w[i];
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            //第i个物品放0个的情况，一定存在， 所以直接更新一下
+            f[i][j]=max(f[i][j],f[i-1][j]);
+            if(j>=v[i]){
+                //二维的情况下，是不需要考虑体积的遍历顺序的,因为i-1的状态是存在与f[i-1][j]里面的。
+                f[i][j]=max(f[i-1][j],f[i][j-v[i]]+w[i]);
+            }
+        }
+    }
+    cout<<f[n][m]<<endl;
+    return 0;
+}
+```
+
+```c++
+//一维优化版本
+#include<iostream>
+
+using namespace std;
+const int N=1010;
+int f[N];
+int v[N],w[N];
+int n,m;
+
+int main(){
+    cin>>n>>m;
+    for(int i=1;i<=n;i++){
+        cin>>v[i]>>w[i];
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=v[i];j<=m;j++){
+            //这里的在算f[j]的时候，因为v[i]>0,所以j-v[i]<j，所以在更新f[j]的时候，f[j-v[i]]已经被算过了，所以f[j-v[i]]是第i个物品的状态
+            //也就是f[i][j-v[i]] 正好符合
+           f[j]=max(f[j],f[j-v[i]]+w[i]);
+        }
+    }
+    cout<<f[m]<<endl;
     return 0;
 }
 ```
