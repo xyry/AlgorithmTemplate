@@ -167,3 +167,61 @@ public:
 };
 ```
 
+### 9月4日 [257. 二叉树的所有路径](https://leetcode-cn.com/problems/binary-tree-paths/) √
+
+dfs+回溯 
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<string> ans;
+    vector<int> v;
+
+    void dfs(TreeNode* node){
+        v.push_back(node->val);
+        if(node->left==NULL&&node->right==NULL){
+            
+            string t="";
+            for(int i=0;i<v.size();i++){
+                if(i==0){
+                    t+=to_string(v[i]);
+                }else{
+                    t+="->"+to_string(v[i]);
+                }
+            }
+            ans.push_back(t);
+            v.pop_back();
+            return;
+        }else{
+            if(node->left!=NULL){
+                dfs(node->left);
+            }
+            if(node->right!=NULL){
+                dfs(node->right);
+            }
+
+        }
+        //回溯
+        v.pop_back();
+        return;
+    }
+
+    vector<string> binaryTreePaths(TreeNode* root) {
+        if(root==NULL) return ans;
+        dfs(root);        
+        return ans;
+    }
+};
+```
+
+
+
