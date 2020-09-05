@@ -3152,6 +3152,49 @@ int main(){
 }
 ```
 
+#### AcWing 5. 多重背包问题II
+
+二进制优化版本，优化成01背包来做
+
+```c++
+#include<iostream>
+#include<vector>
+
+using namespace std;
+const int M=2010;
+int n,m;
+int f[M];
+struct Good{
+    int v,w;
+};
+
+int main(){
+    cin>>n>>m;
+    vector<Good> goods;
+    for(int i=0;i<n;i++){
+        int v,w,s;
+        cin>>v>>w>>s;
+        //拆数
+        for(int k=1;k<=s;k*=2){
+            goods.push_back({v*k,w*k});
+            s-=k;
+        }
+        if(s>0) goods.push_back({s*v,s*w});
+    }
+    
+    for(auto good:goods){
+        for(int j=m;j>=good.v;j--){
+            f[j]=max(f[j],f[j-good.v]+good.w);
+        }
+    }
+    cout<<f[m]<<endl;
+    
+    return 0;
+}
+
+
+```
+
 
 
 ### 模板

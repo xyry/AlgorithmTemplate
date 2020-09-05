@@ -225,3 +225,96 @@ public:
 
 
 
+### 9月5日 [60. 第k个排列](https://leetcode-cn.com/problems/permutation-sequence/) √
+
+不能暴力dfs，会超时。
+
+使用数学方法去做。
+
+```c++
+class Solution {
+public:
+    //预处理阶乘结果
+    int f[15];
+    int vis[15];
+    int N,K;
+    string ans="";
+    int sum;
+    void dfs(int u,int c,bool& flag){
+        if(flag) return;
+        vis[u]=1;
+        // cout<<u<<" "<<c<<" "<<flag<<endl;
+        ans+=to_string(u);
+        if(c==N){
+            flag=1;
+            return;
+        }
+        for(int i=1;i<=N;i++){
+            if(!vis[i]){
+                // int cnt=N-c;
+                // cout<<N-c<<endl;
+                // cout<<f[cnt]<<endl;
+                
+                if(sum+f[N-c-1]<K){
+                    sum=sum+f[N-c-1];
+                    continue;
+                }
+                else{
+                    dfs(i,c+1,flag);
+                }
+            }
+            // if(flag) return;
+        }
+        return;
+    }
+
+    string getPermutation(int n, int k) {
+        f[1]=1;
+        f[0]=1;
+        N=n;
+        K=k;
+        bool flag=false;
+        sum=0;
+        memset(vis,0,sizeof vis);
+        for(int i=2;i<=n;i++) f[i]=i*f[i-1];
+        // for(int i=2;i<=n;i++) cout<<"f["<<i<<"]="<<f[i]<<endl;
+        
+        for(int i=1;i<=n;i++){
+            int cnt=n-1;
+            
+            if(sum+f[cnt]<k){
+                sum+=f[cnt];
+                continue;
+            } 
+            else{
+                dfs(i,1,flag);
+            } 
+        }
+        return ans;
+        
+    }
+};
+/*
+
+//暴力会T
+    int vis[15];
+    int N;
+    vector<string> v;
+    void dfs(int u,int c,string t){
+        vis[u]=1;
+        t+=to_string(u);
+        if(c==N){
+            v.push_back(t);
+            return;
+        }
+        for(int i=1;i<=N;i++){
+            if(!vis[i]){
+                dfs(i,c+1,t);
+                vis[i]=0;
+            }
+        }
+        vis[u]=0;
+    }
+  */
+```
+
