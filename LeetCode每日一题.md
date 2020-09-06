@@ -318,3 +318,50 @@ public:
   */
 ```
 
+### 9月6号 [107. 二叉树的层次遍历 II](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii/) √
+
+BFS，技巧在于，和一般的bfs不一样，每次处理一层的节点，而不是一个一个处理。
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        vector<vector<int>> ans;
+        if(root==NULL) return ans;
+        queue<TreeNode*> q;
+
+        q.push(root);
+        while(!q.empty()){
+            vector<int> level;
+            int size=q.size();
+            for(int i=0;i<size;i++){
+                TreeNode* cur=q.front();
+                level.push_back(cur->val);
+                q.pop();
+                if(cur->left){
+                    q.push(cur->left);
+                }
+                if(cur->right){
+                    q.push(cur->right);
+                    
+                }
+            }
+            ans.push_back(level);
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
+    }
+};
+```
+
+
+
