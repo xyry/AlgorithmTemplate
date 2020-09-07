@@ -3226,6 +3226,43 @@ int main(){
 }
 ```
 
+### 线性DP
+
+#### AcWing 898. 数字三角形
+
+最简单的
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=550;
+int a[N][N];
+int f[N];
+int n;
+
+int main(){
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=i;j++){
+            cin>>a[i][j];
+        }
+    }
+    // for(int i=1;i<=n;i++){
+    //     for(int j=1;j<=i;j++){
+    //         cout<<a[i][j];
+    //     }puts("");
+    // }
+    for(int i=1;i<=n;i++) f[i]=a[n][i];
+    for(int i=n-1;i>=1;i--){
+        for(int j=1;j<=i;j++){
+            f[j]=a[i][j]+max(f[j],f[j+1]);
+        }
+    }
+    cout<<f[1]<<endl;
+    return 0;
+}
+```
+
 
 
 ### 模板

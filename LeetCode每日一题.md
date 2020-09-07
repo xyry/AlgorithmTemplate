@@ -365,3 +365,40 @@ public:
 
 
 
+### 9月7日 [347. 前 K 个高频元素](https://leetcode-cn.com/problems/top-k-frequent-elements/) √
+
+思路：维护一个大小为k的小根堆，当元素数量=k的时候 ，判定，如果新进来的元素 出现次数大于堆顶元素出现的个数，那么丢掉堆顶，加入新的元素。学习了有限队列的写法。
+
+```c++
+class Solution {
+public:
+
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int,int> mp;
+        for(int i=0;i<nums.size();i++){
+            mp[nums[i]]++;
+        }
+        priority_queue<pair<int,int>,vector<pair<int,int>>,greater< pair<int,int> > > pq;
+        for(auto iter=mp.begin();iter!=mp.end();iter++){
+            if(pq.size()==k){
+                if(iter->second > pq.top().first){
+                    pq.pop();
+                    pq.push(make_pair(iter->second,iter->first));
+                }
+            }else{
+                pq.push(make_pair(iter->second,iter->first));
+            }
+            
+        }
+        vector<int> ans;
+        while(!pq.empty()){
+            ans.push_back(pq.top().second);
+            pq.pop();
+        }
+        return ans;
+    }
+};
+```
+
+
+
