@@ -3263,6 +3263,47 @@ int main(){
 }
 ```
 
+#### AcWing 895. 最长上升子序列
+
+$O(n^2)$的做法
+
+状态数量n * 状态转移 n=n^2
+
+动态规划
+
+1. 状态表示 f[i]
+   1. 集合：所有以第i个数结尾的上升子序列
+   2. 属性：f[i]是一个值，这个值代表最大的子序列长度
+2. 状态计算 $f[i]=max(f[j]+1),j=0,1,2,...,i-1$，所以我们需要遍历第i值前面所有值的f[j]，来找最大的那个值
+
+```c++
+#include<iostream>
+using namespace std;
+
+const int N=1010;
+int f[N];
+int n;
+int a[N];
+int main(){
+    cin>>n;
+    for(int i=0;i<n;i++){
+        cin>>a[i];
+        f[i]=1;
+    }
+    int res=0;
+    for(int i=0;i<n;i++){
+        for(int j=0;j<i;j++){
+            if(a[i]>a[j]){
+                f[i]=max(f[i],f[j]+1);
+                res=max(res,f[i]);
+            }
+        }
+    }
+    cout<<res<<endl;
+    return 0;
+}
+```
+
 
 
 ### 模板

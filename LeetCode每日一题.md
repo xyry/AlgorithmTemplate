@@ -402,3 +402,59 @@ public:
 
 
 
+### 9月8日 [77. 组合](https://leetcode-cn.com/problems/combinations/) √
+
+dfs+回溯+剪枝
+
+剪枝的操作是以长度k来操作，如果剩下的数字个数不足以一个k长度的组合，break.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> ans;
+    vector<bool> vis;
+    int K,N;
+    void dfs(int c,int u,vector<int> v){
+        
+        if(u==K){
+            ans.emplace_back(v);
+            return;
+        }
+
+        for(int i=c;i<=N;i++){
+            if(!vis[i]){
+                vis[i]=1;
+                v.emplace_back(i);
+                dfs(i,u+1,v);
+                vis[i]=0;
+                v.pop_back();
+            }
+        }
+        
+    }
+    vector<vector<int>> combine(int n, int k) {
+        if(n==0||k>n) return ans;
+        if(k==0){
+            ans.push_back({});
+            return ans;
+        }
+        
+        K=k;
+        N=n;
+        vis.resize(n+5,false);
+        vector<int> v;
+
+        for(int i=1;i<=n;i++){
+            //剪枝操作
+            if(n-i+1<k) break;
+            v.emplace_back(i);
+            vis[i]=1;
+            dfs(i,1,v);
+            vis[i]=0;
+            v.pop_back();
+        }
+        return ans;
+    }
+};
+```
+
