@@ -3304,6 +3304,43 @@ int main(){
 }
 ```
 
+#### AcWing 896. 最长上升子序列II
+
+$O(nlogn)$的做法
+
+注释写的很详细
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1e5+10;
+//q[i]存储长度为i的最长上升子序列结尾最小的值，可以证明长度越长，结尾最小的值是单调递增的。
+int a[N],q[N];
+int n;
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    int len=0;
+    q[0]=-2e9;
+    for(int i=0;i<n;i++){
+        //找到i之前小于a[i]的最大值，也就是找a[i]之前最长的上升子序列
+        int l=0,r=len;
+        while(l<r){
+            int mid=l+r+1 >>1;
+            if(q[mid]<a[i]) l=mid;
+            else r=mid-1;
+        }
+        //a[i]前找到的最长上升子序列长度为l
+        //那么就更新q[l+1]的值为 a[i]
+        //如果q[l+1]的小于a[i],那么l+1一定会被找出来，不然q[l+1]的值一定大于a[i]，所以用a[i]更新q[l+1]是没问题的。
+        q[++l]=a[i];
+        len=max(len,l);
+    }
+    printf("%d\n",len);
+    return 0;
+}
+```
+
 
 
 ### 模板

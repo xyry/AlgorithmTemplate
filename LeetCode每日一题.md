@@ -458,3 +458,53 @@ public:
 };
 ```
 
+### 9月9日 [39. 组合总和](https://leetcode-cn.com/problems/combination-sum/) √
+
+dfs+回溯 +一点点剪枝
+
+题目数据太弱了，不过我也没有更好的处理比较复杂数据的办法
+
+```c++
+class Solution {
+public:
+//递归500层？可以实现？先写个试试
+/*
+我自己用这个数据测就T了， 提交居然过了？以后管他的，先提交一发试试算了，说不定数据贼弱呢……
+[1,2,3,4]
+500
+*/ 
+    vector<vector<int>> ans;
+    vector<int> v;
+    void dfs(int id,int sum,int target,vector<int> candidates){
+        if(sum==target){
+            ans.push_back(v);
+            return;
+        }
+        for(int i=id;i<candidates.size();i++){
+            if(target-sum>=candidates[i]){
+                v.push_back(candidates[i]);
+                dfs(i,sum+candidates[i],target,candidates);
+                v.pop_back();
+            }else{
+                break;
+            }
+        }
+        return;
+    }
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        sort(candidates.begin(),candidates.end());
+        int size=candidates.size();
+        for(int i=0;i<size;i++){
+            if(candidates[i]<=target){
+                v.push_back(candidates[i]);
+                dfs(i,candidates[i],target,candidates);
+                v.pop_back();
+            }else{
+                break;
+            }
+        }
+        return ans;
+    }
+};
+```
+
