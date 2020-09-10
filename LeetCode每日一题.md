@@ -508,3 +508,48 @@ public:
 };
 ```
 
+### 9月10日 [40. 组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii/) √
+
+题目和昨天差不多，区别在于，数组中出现的每一个数字只能用一次，并且要考虑去重的问题。
+
+用set去重即可。
+
+```c++
+class Solution {
+public:
+    int N;
+    set<vector<int>> st;
+    void dfs(int id,int target,vector<int>& v,vector<vector<int>>& ans,vector<int>& candidates){
+        if(target==0){
+            // ans.push_back(v);
+            st.insert(v);
+            return;
+        }
+        for(int i=id+1;i<N;i++){
+            if(target>=candidates[i]){
+                v.push_back(candidates[i]);
+                dfs(i,target-candidates[i],v,ans,candidates);
+                v.pop_back();
+            }
+        }
+        return;
+    }
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        
+        sort(candidates.begin(),candidates.end());
+        vector<int> v;
+        vector<vector<int>> ans;
+        N=candidates.size();
+        for(int i=0;i<candidates.size();i++){
+            v.push_back(candidates[i]);
+            dfs(i,target-candidates[i],v,ans,candidates);
+            v.pop_back();
+        }  
+        for(auto iter=st.begin();iter!=st.end();iter++){
+            ans.push_back(*iter);
+        }
+        return ans;  
+    }
+};
+```
+
