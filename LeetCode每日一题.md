@@ -553,3 +553,46 @@ public:
 };
 ```
 
+### 9月11日 [216. 组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii/) √
+
+dfs+回溯
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> ans;
+    vector<int> v;
+    int K;
+    void dfs(int u,int id,int target){
+        if(u==K){
+            if(target==0) ans.push_back(v);
+            return;
+        }
+        for(int i=id+1;i<=9;i++){
+            if(id<=target){
+                v.push_back(i);
+                dfs(u+1,i,target-i);
+                v.pop_back();
+            }else{
+                break;
+            }
+            
+        }
+        
+    }
+    vector<vector<int>> combinationSum3(int k, int n) {
+        K=k;
+        if(n<1||n>45){
+            return ans;
+        }
+        for(int i=1;i<=9;i++){
+            v.push_back(i);
+            dfs(1,i,n-i);
+            v.pop_back();
+        }
+        
+        return ans;
+    }
+};
+```
+

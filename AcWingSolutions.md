@@ -3385,6 +3385,42 @@ int main(){
 }
 ```
 
+#### AcWing 902. 最短编辑距离
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int INF=0x3f3f3f3f;
+const int N=1010;
+char a[N],b[N];
+int n,m;
+int f[N][N];
+int main(){
+    cin>>n>>a+1>>m>>b+1;
+    // memset(f,INF,sizeof f);
+    
+    //初始化，要单独看，当a用0个字符与b的i个字符匹配时，只能用添加操作
+    for(int i=0;i<=m;i++) f[0][i]=i;
+    
+    //初始化，要单独看，当a用i个字符与b的0个字符匹配时，只能用删除操作
+    for(int i=0;i<=n;i++) f[i][0]=i;
+    
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(a[i]==b[j]){
+                f[i][j]=f[i-1][j-1];
+            }else {
+                f[i][j]=min(f[i-1][j],min(f[i-1][j-1],f[i][j-1]))+1;
+            }
+        }
+    }
+    
+    cout<<f[n][m]<<endl;
+    return 0;
+}
+```
+
 
 
 ### 模板
