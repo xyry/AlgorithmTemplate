@@ -3421,6 +3421,68 @@ int main(){
 }
 ```
 
+#### AcWing 899. 编辑距离
+
+对每一对字符求最小编辑距离即可。
+
+存在坑点，看代码
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+//注意数据范围，不然会TLE.有1000个字符，每个字符长度为10，所以一维开1010，二维开15
+const int N=15,M=1010;
+int n,m;
+char a[M][N],b[N];
+int k;
+bool check(char ta[],char tb[],int k){
+    // cout<<"k="<<k<<endl;
+    int f[N][N];
+    memset(f,0,sizeof f);
+    
+    int sa=strlen(ta+1);
+    int sb=strlen(tb+1);
+    //当a取0个字符，b有i个字符，这个时候a->b  只能采用添加字符操作，操作次数为i次
+    for(int j=0;j<=sb;j++) f[0][j]=j;
+    //当a有i个字符，b有0个字符，这个时候a->b 只能采用删除操作，操作次数为i次
+    for(int i=0;i<=sa;i++) f[i][0]=i;
+        
+    for(int i=1;i<=sa;i++){
+        for(int j=1;j<=sb;j++ ){
+            if(ta[i]==tb[j]) f[i][j]=f[i-1][j-1];
+            else f[i][j]=min(f[i-1][j-1],min(f[i-1][j],f[i][j-1]))+1;
+        }
+    }
+    // cout<<ta<<","<<tb<<","<<f[sa][sb]<<endl;
+    if(f[sa][sb]<=k) return true;
+    else return false;
+}
+
+int main(){
+    cin>>n>>m;
+    for(int i=1;i<=n;i++){
+        cin>>a[i]+1;
+    }
+    for(int i=1;i<=m;i++){
+        int ans=0;
+        cin>>b+1>>k;
+        // cout<<k<<endl;
+        //在线做，输入一个处理一个
+        for(int j=1;j<=n;j++){
+            // int sa=strlen(a[j]);
+            // int sb=strlen(b[i]);
+            //坑点，如果传入的值是 a[j]+1,b 那么在check函数里面，字符的索引就得从0开始了，而不是1.巨坑！！！！
+            bool f=check(a[j],b,k);
+            if(f) ans++;
+        }
+        cout<<ans<<endl;
+    }
+    
+    return 0;
+}
+```
+
 
 
 ### 模板

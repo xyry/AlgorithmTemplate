@@ -596,3 +596,41 @@ public:
 };
 ```
 
+### 9月12日 [637. 二叉树的层平均值](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/) √
+
+用BFS实现层次遍历
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<double> averageOfLevels(TreeNode* root) {
+        vector<double> ans;
+        if(!root) return ans;
+        queue<TreeNode*> q;
+        q.push(root);
+        while(q.size()){
+            long long sum=0;
+            int size=q.size();
+            for(int i=0;i<size;i++){
+                TreeNode* t=q.front();
+                q.pop();
+                sum+=t->val;
+                if(t->left) q.push(t->left);
+                if(t->right) q.push(t->right);
+            }
+            ans.push_back(sum*1.0/size*1.0);
+        }
+        return ans;
+    }
+};
+```
+
