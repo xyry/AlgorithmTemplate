@@ -3483,6 +3483,240 @@ int main(){
 }
 ```
 
+### 区间DP
+
+#### AcWing 282. 石子合并
+
+挺难的，会写代码，但是还不太懂
+
+枚举长度
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+const int N=310;
+int s[N];
+int f[N][N];
+int n;
+int main(){
+    cin>>n;
+    memset(f,0x3f,sizeof f);
+    for(int i=1;i<=n;i++) cin>>s[i];
+    for(int i=1;i<=n;i++) s[i]+=s[i-1];
+    
+    for(int i=1;i<=n;i++) f[i][i]=0;
+    
+    //枚举长度
+    
+    for(int len=2;len<=n;len++){
+        for(int i=1;i+len-1<=n;i++){
+            int l=i,r=i+len-1;
+            for(int k=l;k<r;k++){
+                f[l][r]=min(f[l][r],f[l][k]+f[k+1][r]+s[r]-s[l-1]);
+            }
+        }
+    }
+    cout<<f[1][n]<<endl;
+    return 0;
+}
+```
+
+### 计数类DP
+
+#### AcWing 900. 整数划分
+
+用完全背包的思想去做
+
+动态规划
+
+1. 状态表示
+
+   1. 集合：$f[i][j]$表示1-i所有数字组成j的方案
+   2. 值：方案的个数
+
+2. 状态转移，我们考虑数字i选取的个数
+
+   1. 当i选0个的时候 $f[i][j]=f[i-1][j]$
+   2. 当i选1个的时候 $f[i][j]=f[i-1][j-i]$
+   3. 当i选2个的时候 $f[i][j]=f[i-1][j-2i]$
+   4. ...
+   5. 当i选s个的时候 $f[i][j]=f[i-1][j-s*i]$
+
+   所以状态转移方程写成
+   $$
+   f[i][j]=f[i-1][j]+f[i-1][j-i]+f[i-1][j-2*i]+...+f[i-1][j-s*i]
+   $$
+   我们可以发现
+   $$
+   f[i][j-i]=f[i-1][j-i]+f[i-1][j-2*i]+...+f[i-1][j-s*i]
+   $$
+   把公式2带入公式1，可以写成
+   $$
+   f[i][j]=f[i-1][j]+f[i][j-i]
+   $$
+   然后我们进行降维操作，去掉一维
+   $$
+   f[j]=f[j]+f[j-i]
+   $$
+   为了保证每次更新的时候用的都是上一个状态，所以j要从小到大枚举，证明过程
+
+   
+
+```c++
+#include<iostream>
+using namespace std;
+const int N=1010,mod=1e9+7;
+int f[N];
+int n;
+int main(){
+    cin>>n;
+    f[0]=1;
+    for(int i=1;i<=n;i++){
+        for(int j=i;j<=n;j++){
+            f[j]=(f[j]+f[j-i])%mod;
+        }
+    }
+    cout<<f[n]<<endl;
+    return 0;
+}
+```
+
+### 状态压缩DP
+
+#### AcWing 291. 蒙德里安的梦想
+
+状态压缩入门题
+
+这道题的思考方式，当我们把所有横着放的方案确定好之后，剩下的竖着方法方案一定是确定的，只要找空插竖着的方格即可，当然这要考虑合法的问题，所以，这个问题就转换成枚举所有横着摆放方格的方案了。
+
+$f[i][j]$中，i代表第i列，j代表状态，一个用二进制表示的十进制数，二进制的位数取决于总共的行数，如果当前行有从前一列伸出来的方格，那么当前行置为1，不然就置为0。所以$f[i][j]$代表的集合是：有哪些行从i-1列伸到i列，并且使第i列的状态为j的方案数。
+
+我们假设第i-1列的状态为:1001
+
+1. 假设目标状态j的状态为1000，这个时候j&k!=0,有冲突，i-1列的第一行已经伸到i列了，所以第i列不可能伸出一行到i+1列。所以状态转移的第一个要求就是$j\&k==0$，即相邻两列不会有冲突，同一行只能伸出一次。
+2. 假设目标状态j的状态0100，这个时候j&k==0，满足第一个要求，但是j|k=1101，剩下的空间（连续0的个数）不能摆放竖着的方格，是一个非法状态。所以第二个要求就是状态j|k中连续的0必须是偶数。
+3. 假设j=0000，满足j&k==0,j|k=1001,合法，$f[i][j]+=f[i-1][k]$，当前状态j可以由i-1列的状态k转移过来。
+
+看代码
+
+
+
+```c++
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+
+const int N=12,M=1<<N;
+bool st[M];
+long long f[N][M];
+
+int n,m;
+
+int main(){
+    while(cin>>n>>m,n||m){
+        memset(f,0,sizeof f);
+        //提前算出所有不合法的状态
+        for(int i=0;i< 1<<n;i++){
+            int cnt=0;
+            st[i]=true;
+            for(int j=0;j<n;j++){
+                if(i>>j&1){
+                    if(cnt&1){
+                        st[i]=false;
+                        break;
+                    } 
+                    cnt=0;
+                }else cnt++;
+                
+            }
+            if(cnt&1) st[i]=false;
+        }
+        f[0][0]=1;
+        for(int i=1;i<= m;i++){
+            for(int j=0;j<1<<n;j++){
+                for(int k=0;k< 1<<n;k++){
+                    //第一个条件，妹有冲突
+                    //第二个条件，合法
+                    if((j&k)==0 && st[j|k]){
+                        f[i][j]+=f[i-1][k];
+                    }
+                }
+            }
+        }
+        cout<<f[m][0]<<endl;
+    }
+    
+    return 0;
+}
+```
+
+预处理状态转移的条件，加速
+
+```c++
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<vector>
+using namespace std;
+
+const int N=12,M=1<<N;
+bool st[M];
+long long f[N][M];
+vector<int> state[M];
+int n,m;
+
+int main(){
+    while(cin>>n>>m,n||m){
+        memset(f,0,sizeof f);
+        
+        //提前算出所有不合法的状态
+        for(int i=0;i< 1<<n;i++){
+            int cnt=0;
+            st[i]=true;
+            for(int j=0;j<n;j++){
+                if(i>>j&1){
+                    if(cnt&1){
+                        st[i]=false;
+                        break;
+                    } 
+                    cnt=0;
+                }else cnt++;
+                
+            }
+            if(cnt&1) st[i]=false;
+        }
+        //预处理判断条件  加速效果明显 904ms->194ms
+        for(int j=0;j< 1<<n;j++){
+            state[j].clear();
+            for(int k=0;k< 1<<n;k++){
+                if((j&k)==0&&st[j|k]) state[j].push_back(k);
+            }
+        }
+        f[0][0]=1;
+        for(int i=1;i<= m;i++){
+            for(int j=0;j<1<<n;j++){
+                for(int k=0;k<state[j].size();k++){
+                    f[i][j]+=f[i-1][state[j][k]];
+                }
+                // for(int k=0;k< 1<<n;k++){
+                //     //第一个条件，妹有冲突
+                //     //第二个条件，合法
+                //     if((j&k)==0 && st[j|k]){
+                //         f[i][j]+=f[i-1][k];
+                //     }
+                // }
+            }
+        }
+        cout<<f[m][0]<<endl;
+    }
+    
+    return 0;
+}
+```
+
 
 
 ### 模板

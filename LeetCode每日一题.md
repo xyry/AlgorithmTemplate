@@ -634,3 +634,156 @@ public:
 };
 ```
 
+### 9月13日 [79. 单词搜索](https://leetcode-cn.com/problems/word-search/) √
+
+dfs+回溯
+
+```c++
+class Solution {
+public:
+    int d[4][2]={{1,0},{-1,0},{0,1},{0,-1}};
+    bool flag=false;
+    int vis[210][210];
+    void dfs(int x,int y,vector<vector<char>>& board,string word,int index){
+        // cout<<"x="<<x<<",y="<<y<<",board[x][y]="<<board[x][y]<<endl;
+        if(flag) return;
+        if(index==word.size()-1){
+            flag=true;
+            return;
+        } 
+        for(int i=0;i<4;i++){
+            int nx=x+d[i][0];
+            int ny=y+d[i][1];
+            if(nx>=0&&nx<board.size()&&ny>=0&&ny<board[0].size()&&!vis[nx][ny]&&board[nx][ny]==word[index+1]){
+                vis[nx][ny]=1;
+                dfs(nx,ny,board,word,index+1);
+                vis[nx][ny]=0;
+            }
+        }
+        return;
+    }
+    bool exist(vector<vector<char>>& board, string word) {
+        int n=board.size();
+        if(n==0) return false;
+        int m=board[0].size();
+        if(n*m<word.size()) return false;
+        memset(vis,false,sizeof vis);
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(board[i][j]==word[0]){
+                    vis[i][j]=1;
+                    dfs(i,j,board,word,0);
+                    vis[i][j]=0;
+                }
+                if(flag) break;
+            }
+            if(flag) break;
+        }
+        return flag;
+    }
+};
+```
+
+### 9月14日 [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) √
+
+中序遍历：左中右
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> ans;
+    void dfs(TreeNode* node){
+        if(node==NULL) return;
+        dfs(node->left);
+        ans.push_back(node->val);
+        dfs(node->right);
+        return;
+    }
+
+    vector<int> inorderTraversal(TreeNode* root) {
+        dfs(root);
+        return ans;
+    }
+};
+```
+
+### 9月15日 [37. 解数独](https://leetcode-cn.com/problems/sudoku-solver/) √
+
+两个难点
+
+1. 如何搜：记录下所有空白格，挨个挨个搜空白格
+2. 如何退出：记录下一个flag，如果找到一个解，就立刻退出，要在for循环那也写上!flag。不然解总是有问题
+
+看代码
+
+```c++
+class Solution {
+public:
+    int cate[3][3]={{0,3,6},{1,4,7},{2,5,8}};
+    bool col[10][10];
+    bool row[10][10];
+    bool square[10][10];
+    vector<pair<int,int>> space;
+    bool flag=false;
+    void dfs(vector<vector<char>>& board,int index){
+        if(flag) return;
+        if(index==space.size()){
+            flag=true;
+            return;
+        }
+        int cx=space[index].first;
+        int cy=space[index].second;
+        //不加这个!flag,每一行都会有个数字不对，找到一个解后，要立即退出
+        for(int i=1;i<=9&&!flag;i++){
+            if(!col[cy][i]&&!row[cx][i]&&!square[cate[cy/3][cx/3]][i]){
+                col[cy][i]=1;
+                row[cx][i]=1;
+                square[cate[cy/3][cx/3]][i]=1;
+                board[cx][cy]=i+'0';
+                dfs(board,index+1);
+                col[cy][i]=0;
+                row[cx][i]=0;
+                square[cate[cy/3][cx/3]][i]=0;
+                // board[cx][cy]='.';
+            }
+        }
+    }
+    void solveSudoku(vector<vector<char>>& board) {
+        memset(col,false,sizeof col);
+        memset(row,false,sizeof row);
+        memset(square,false,sizeof square);
+        //初始化状态量
+        for(int i=0;i<9;i++){
+            for(int j=0;j<9;j++){
+                if(board[i][j]!='.'){
+                    int num=board[i][j]-'0';
+                    col[j][num]=1;
+                    row[i][num]=1;
+                    int d1=j/3;
+                    int d2=i/3;
+                    // cout<<"num="<<num<<",cate[d1][d2]="<<cate[d1][d2]<<endl;
+                    square[cate[d1][d2]][num]=1;
+                }else{
+                    space.emplace_back(make_pair(i,j));
+                }
+            }
+        }
+        // for(int i=0;i<space.size();i++){
+        //     cout<<space[i].first<<","<<space[i].second<<endl;
+        // }
+        dfs(board,0);
+
+        return;
+    }
+};
+```
+
