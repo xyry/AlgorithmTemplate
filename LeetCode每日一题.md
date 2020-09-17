@@ -4,6 +4,56 @@
 
 ## 9月
 
+### 题目类型汇总
+
+#### DFS（11）
+
+[486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/)  dfs+记忆化
+
+[51. N 皇后](https://leetcode-cn.com/problems/n-queens/)  dfs+回溯
+
+[257. 二叉树的所有路径](https://leetcode-cn.com/problems/binary-tree-paths/)   dfs+回溯
+
+[77. 组合](https://leetcode-cn.com/problems/combinations/)  dfs+回溯+剪枝
+
+[39. 组合总和](https://leetcode-cn.com/problems/combination-sum/)  dfs+回溯 +一点点剪枝
+
+[40. 组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii/)  dfs
+
+[216. 组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii/) dfs+回溯
+
+[79. 单词搜索](https://leetcode-cn.com/problems/word-search/)  dfs+回溯
+
+[94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) dfs
+
+[37. 解数独](https://leetcode-cn.com/problems/sudoku-solver/)  dfs
+
+[226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) dfs
+
+#### BFS（2）
+
+[107. 二叉树的层次遍历 II](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii/) 
+
+[637. 二叉树的层平均值](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/)
+
+#### 堆排序（1）
+
+[347. 前 K 个高频元素 ](https://leetcode-cn.com/problems/top-k-frequent-elements/) 维护一个小根堆
+
+#### 数学（1）
+
+[60. 第k个排列](https://leetcode-cn.com/problems/permutation-sequence/) 
+
+#### 并查集（1）
+
+[685. 冗余连接 II](https://leetcode-cn.com/problems/redundant-connection-ii/)
+
+#### 模拟（1）
+
+[剑指 Offer 20. 表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/) 
+
+
+
 ### 9月1日  [486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/) √
 
 做法：dfs+记忆化
@@ -816,6 +866,63 @@ public:
         if(root==NULL) return root;
         dfs(root);
         return root;
+    }
+};
+```
+
+### 9月17日 [685. 冗余连接 II](https://leetcode-cn.com/problems/redundant-connection-ii/) √
+
+并查集，代码里有思路
+
+```c++
+class Solution {
+public:
+    int n;
+    vector<int> ans;
+    vector<int> fa;
+    int find(int x){
+        return fa[x]==x?x:fa[x]=find(fa[x]);
+    }
+    vector<int> degree;
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
+        n=edges.size();
+        fa.resize(n+5);
+        degree.resize(n+5);
+        for(int i=0;i<n;i++){
+            degree[edges[i][1]]++;
+        }
+        //逆序访问入度为2的点，然后去除该边，若剩下的边可以组成一个连通块，证明该边多余
+        for(int i=n-1;i>=0;i--){
+            if(degree[edges[i][1]]==2){
+                if(helper(edges,i)) return edges[i];
+            }
+        }
+        //逆序访问入度为1的点，然后去除该边，若剩下的边可以组成一个连通块，证明该边多余
+        for(int i=n-1;i>=0;i--){
+            if(degree[edges[i][1]]==1){
+                if(helper(edges,i)) return edges[i];
+            }
+        }
+        return ans;
+    }
+    bool helper(vector<vector<int>>& edges,int conflict){
+        int cnt=n;
+        // 初始化所有节点的父节点为自己
+        for(int i=1;i<=n;i++) fa[i]=i;
+        //
+        for(int i=0;i<n;i++){
+            if(i==conflict) continue;
+            int a=edges[i][0];
+            int b=edges[i][1];
+            int fx=find(a);
+            int fy=find(b);
+            //合并两个连通块，连通块个数减去1
+            if(fx!=fy){
+                fa[fy]=fx;
+                cnt--;
+            }
+        }
+        return cnt==1;
     }
 };
 ```

@@ -3756,6 +3756,68 @@ int main(){
 }
 ```
 
+### 树形DP
+
+#### AcWing 285. 没有上司的舞会
+
+这种题思维难度不大
+
+比起前面几道DP题，这道题不难
+
+```c++
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+const int N=6010;
+int happy[N];
+int f[N][2];
+int h[N],e[N],ne[N],idx;
+bool has_father[N];
+int n;
+
+void add(int a,int b){
+    e[idx]=b;
+    ne[idx]=h[a];
+    h[a]=idx++;
+}
+
+void dfs(int u){
+    f[u][1]=happy[u];
+    for(int i=h[u];i!=-1;i=ne[i]){
+        int j=e[i];
+        dfs(j);
+        f[u][0]+=max(f[j][0],f[j][1]);
+        f[u][1]+=f[j][0];
+    }
+}
+
+int main(){
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>happy[i];
+    }
+    //邻接矩阵的头全部置为-1
+    memset(h,-1,sizeof h);
+    
+    for(int i=0;i<n-1;i++){
+        int a,b;
+        cin>>a>>b;
+        has_father[a]=1;
+        add(b,a);
+    }
+    //找一下根节点，没有父节点的节点就是根节点
+    int root=1;
+    while(has_father[root]) root++;
+    
+    dfs(root);
+    cout<<max(f[root][0],f[root][1])<<endl;
+    
+    return 0;
+}
+
+```
+
 
 
 ### 模板
