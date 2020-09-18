@@ -6,7 +6,7 @@
 
 ### 题目类型汇总
 
-#### DFS（11）
+#### DFS（12）
 
 [486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/)  dfs+记忆化
 
@@ -29,6 +29,8 @@
 [37. 解数独](https://leetcode-cn.com/problems/sudoku-solver/)  dfs
 
 [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) dfs
+
+[47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) dfs+回溯
 
 #### BFS（2）
 
@@ -925,5 +927,61 @@ public:
         return cnt==1;
     }
 };
+```
+
+### 9月18日 [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) √
+
+DFS+回溯
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> ans;
+    vector<int> v;
+    set<vector<int>> st;
+    int n;
+    void dfs(int x,int u,vector<int> &nums,vector<bool>& vis){
+        if(u==n){
+            st.insert(v);
+            return;
+        }
+        for(int i=0;i<n;i++){
+            //加了这句速度快很多
+            if(i>0&&nums[i]==nums[i-1]&&vis[i-1]){
+                continue;
+            } 
+            if(!vis[i]){
+                vis[i]=1;
+                v.push_back(nums[i]);
+                dfs(i,u+1,nums,vis);
+                vis[i]=0;
+                v.pop_back();
+            }
+        }
+    }
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        sort(nums.begin(),nums.end());
+        n=nums.size();
+        vector<bool> vis(n+5,false);
+        for(int i=0;i<n;i++){
+            // memset(vis,false,sizeof vis);
+            vis[i]=1;
+            v.push_back(nums[i]);
+            dfs(i,1,nums,vis);
+            v.pop_back();
+            vis[i]=0;
+        }
+        for(auto it:st){
+            ans.emplace_back(it);
+        }
+        return ans;
+    }
+};
+```
+
+### xx月xx日 √
+
+```c++
+
 ```
 

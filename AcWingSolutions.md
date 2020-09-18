@@ -3818,6 +3818,57 @@ int main(){
 
 ```
 
+### 记忆化DP
+
+#### AcWing 901. 滑雪
+
+这道题更像是一道记忆化搜索
+
+```c++
+#include<cstring>
+#include<iostream>
+using namespace std;
+const int N=310;
+int n,m;
+int h[N][N];
+int f[N][N];
+int res;
+int d[4][2]={{0,1},{0,-1},{-1,0},{1,0}};
+int dp(int x,int y){
+    //这种写法，v就等价于f[x][y]，更新v就等价于更新f[i][j]
+    int &v=f[x][y];
+    if(v!=-1) return v;
+    //当前路径没有走过，初始化为1
+    v=1;
+    for(int i=0;i<4;i++){
+        int nx=x+d[i][0];
+        int ny=y+d[i][1];
+        if(nx>=1&&nx<=n&&ny>=1&&ny<=m&&h[nx][ny]<h[x][y]){
+            v=max(v,dp(nx,ny)+1);
+        }
+    }
+    return v;
+    
+    
+}
+int main(){
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            scanf("%d",&h[i][j]);
+        }
+    }
+    memset(f,-1,sizeof(f));
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            res=max(res,dp(i,j));
+        }
+    }
+    printf("%d\n",res);
+    return 0;
+}
+```
+
 
 
 ### 模板
