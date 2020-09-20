@@ -3869,6 +3869,98 @@ int main(){
 }
 ```
 
+## 第六讲 贪心
+
+### 区间问题
+
+#### AcWing 905. 区间选点
+
+策略，按照右端点排序
+
+```c++
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+const int N=1e5+10;
+int n;
+
+struct node{
+    int l,r;
+    bool operator < (const node& rhs )const{
+        return r<rhs.r;
+    }
+};
+vector<node> v;
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        node t;
+        int a,b;
+        scanf("%d%d",&a,&b);
+        t.l=a;
+        t.r=b;
+        v.push_back(t);
+    }
+    sort(v.begin(),v.end());
+    int cur=v[0].r;
+    int ans=1;
+    for(int i=0;i<n;i++){
+        if(v[i].l<=cur){
+            continue;
+        }else{
+            cur=v[i].r;
+            ans++;
+        }
+    }
+    printf("%d\n",ans);
+    return 0;
+}
+```
+
+#### AcWing 908. 最大不相交区间的数量
+
+右端点排序，数数。
+
+居然和上一道题做法一样，但是证明需要花点时间，但是就是能AC……
+
+```c++
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=1e5+10;
+
+int n;
+struct Range{
+    int l,r;
+    bool operator <(const Range& rhs)const {
+        return r<rhs.r;
+    }
+}range[N];
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        range[i]={a,b};
+    }
+    sort(range,range+n);
+    int ans=0,ed=-2e9;
+    for(int i=0;i<n;i++){
+        if(ed<range[i].l){
+            ed=range[i].r;
+            ans++;
+        }
+    }
+    printf("%d\n",ans);
+    return 0;
+    
+}
+```
+
 
 
 ### 模板

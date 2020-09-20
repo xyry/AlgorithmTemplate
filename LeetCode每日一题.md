@@ -6,7 +6,7 @@
 
 ### 题目类型汇总
 
-#### DFS（12）
+#### DFS（14）
 
 [486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/)  dfs+记忆化
 
@@ -31,6 +31,10 @@
 [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) dfs
 
 [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) dfs+回溯
+
+[404. 左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves/) dfs
+
+[78. 子集](https://leetcode-cn.com/problems/subsets/) dfs
 
 #### BFS（2）
 
@@ -978,6 +982,119 @@ public:
     }
 };
 ```
+
+### 9月19日 [404. 左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves/) √
+
+简单dfs
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int ans=0;
+
+    void dfs(TreeNode* root,bool isleft){
+        if(root!=NULL){
+            //当前节点是叶子节点
+            if(!root->left&&!root->right&&isleft){
+                ans+=root->val;
+            }else{
+                if(root->left)
+                    dfs(root->left,1);
+                if(root->right)
+                    dfs(root->right,0);
+            }
+        }
+    }
+
+    int sumOfLeftLeaves(TreeNode* root) {
+
+        if(root==NULL) return ans;
+        dfs(root,0);
+
+        return ans;
+    }
+};
+```
+
+### 9月20日 [78. 子集](https://leetcode-cn.com/problems/subsets/) √
+
+还就是DFS呗
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> ans;
+    int n;
+    vector<bool> vis;
+    vector<int> v;
+    void dfs(int index,int u,int target,vector<int>& nums){
+        if(u==target){
+            ans.push_back(v);
+            return;
+        }
+        for(int i=index+1;i<n;i++){
+            if(!vis[i]){
+                vis[i]=1;
+                v.push_back(nums[i]);
+                dfs(i,u+1,target,nums);
+                vis[i]=0;
+                v.pop_back();
+            }
+        }
+    }
+
+    vector<vector<int>> subsets(vector<int>& nums) {
+        //排序可排也可以不排
+        sort(nums.begin(),nums.end());
+        //空集是任何元素的子集
+        ans.push_back({});
+        n=nums.size();
+        //vis初始化  
+        vis.resize(n,false);
+        //如果Nums中没有元素，直接返回只有一个空集的答案
+        if(n==0) return ans;
+        
+        //把每一个元素做为单个自己加入
+        for(int i=0;i<n;i++){
+            ans.push_back({nums[i]});
+        }
+        //如果nums中只有一个元素，那么现在就可以返回答案了
+        if(n==1) return ans;
+        //枚举子集的长度，从2->n-1
+        for(int i=2;i<n;i++){
+            //枚举起点，并且在这里判断从该起点到最后一个元素的长度能否组成一个长度为i的集合，不能直接退出。
+            for(int j=0;j<=n-i;j++){
+                //常规回溯操作
+                vis[j]=1;
+                v.push_back(nums[j]);
+                dfs(j,1,i,nums);
+                vis[j]=0;
+                v.pop_back();
+            }
+            
+        }
+        //nums本身也是一个子集
+        ans.push_back(nums);
+
+        return ans;
+    }
+};
+```
+
+
+
+
+
+
 
 ### xx月xx日 √
 
