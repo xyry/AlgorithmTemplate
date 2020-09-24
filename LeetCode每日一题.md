@@ -6,7 +6,7 @@
 
 ### 题目类型汇总
 
-#### DFS（14）
+#### DFS（18）
 
 [486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/)  dfs+记忆化
 
@@ -35,6 +35,15 @@
 [404. 左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves/) dfs
 
 [78. 子集](https://leetcode-cn.com/problems/subsets/) dfs
+
+[538. 把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/) 树+dfs
+
+[968. 监控二叉树](https://leetcode-cn.com/problems/binary-tree-cameras/) dfs
+
+[617. 合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees/) dfs
+
+[501. 二叉搜索树中的众数](https://leetcode-cn.com/problems/find-mode-in-binary-search-tree/) dfs
+
 
 #### BFS（2）
 
@@ -1093,6 +1102,165 @@ public:
 
 
 
+
+
+
+### 9月21日 [538. 把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/) √
+
+二叉树+dfs
+
+这种我就不是擅长
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int sum=0;
+   
+
+    TreeNode* convertBST(TreeNode* root) {
+        if(root!=NULL){
+            convertBST(root->right);
+            sum+=root->val;
+            root->val=sum;
+            convertBST(root->left);
+        }
+        return root;
+    }
+};
+```
+
+### 9月22日 [968. 监控二叉树](https://leetcode-cn.com/problems/binary-tree-cameras/) √
+
+思路在代码里
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int res=0;
+    int minCameraCover(TreeNode* root) {
+        if(dfs(root)==0){
+            res++;
+        }
+        return res;
+    }
+    int dfs(TreeNode* node){
+        /*
+            0代表待覆盖
+            1代表被覆盖
+            2代表安装了相机
+        */
+        if(node==NULL){
+            return 1;
+        }
+        int left=dfs(node->left);
+        int right=dfs(node->right);
+        if(left==1&&right==1){
+            //当前点的两个儿子都被覆盖了，所以当前点待处理
+            //当前点可以被其父节点监控，也可以被其自身监控，所以目前设置为待处理的状态。
+            return 0;
+        }
+        else if(left==0||right==0){
+            //左右儿子其中1个或者2个没有被处理，那么当前点必须安装相机来监控左右儿子节点
+            res++;
+            return 2;
+        }else  if(left+right>=3){
+            //也就是左右两个节点其一有相机或者两个都有相机，那么当前点一定可以被覆盖掉
+            return 1;
+        }
+        return 0;
+    }
+};
+```
+
+### 9月23日 [617. 合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees/) √
+
+创建一个新的节点或者在原节点上操作也行
+
+
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+        if(t1==NULL&&t2==NULL) return NULL;
+        TreeNode* root=new TreeNode(0);
+        if(t1!=NULL&&t2!=NULL){
+            root->val+=t1->val+t2->val;
+        }else if(t1){
+            root->val+=t1->val;
+            // root=new TreeNode(t1->val);
+        }else if(t2)
+            root->val+=t2->val;
+            // root=new TreeNode(t2->val);
+        root->left=mergeTrees(t1==NULL?NULL:t1->left,t2==NULL?NULL:t2->left);
+        root->right=mergeTrees(t1==NULL?NULL:t1->right,t2==NULL?NULL:t2->right);
+        return root;
+    }
+};
+```
+
+### 9月24日 [501. 二叉搜索树中的众数](https://leetcode-cn.com/problems/find-mode-in-binary-search-tree/) √
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<int,int> mp;
+    int ans=-1;
+    vector<int> ret;
+    void dfs(TreeNode* node){
+        if(node==NULL) return ;
+        mp[node->val]++;
+        ans=max(ans,mp[node->val]);
+        dfs(node->left);
+        dfs(node->right);
+    }
+    vector<int> findMode(TreeNode* root) {
+        dfs(root);
+        for(auto &it:mp){
+            if(it.second==ans){
+                ret.push_back(it.first);
+            }
+        }
+        return ret;
+    }
+};
+```
 
 
 

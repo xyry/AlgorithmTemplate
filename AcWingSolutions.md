@@ -4,6 +4,8 @@ AcWing 做题记录
 
 # 算法基础课
 
+
+
 ## 第一讲 基础算法
 
 ### 排序
@@ -3961,7 +3963,244 @@ int main(){
 }
 ```
 
+#### AcWing 906. 区间分组
 
+左端点+小根堆
+
+```c++
+#include<iostream>
+#include<queue>
+#include<algorithm>
+
+using namespace std;
+
+const int N=1e5+10;
+int n;
+struct Range{
+    int l,r;
+    bool operator<(const Range& rhs)const {
+        return l<rhs.l;
+    }
+}range[N];
+
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        range[i]={a,b};
+    }
+    
+    sort(range,range+n);
+    priority_queue<int,vector<int>,greater<int>> heap;
+    for(int i=0;i<n;i++){
+        auto r=range[i];
+        //所有分组中，最小的右端点大于当前区间的左端点
+        if(heap.empty()||heap.top()>=r.l) heap.push(r.r);
+        else{
+            //最小的右端点小于当前点的左端点
+            heap.pop();
+            heap.push(r.r);
+            
+        }
+            
+        
+    }
+    printf("%d\n",heap.size());
+    return 0;
+}
+```
+
+#### AcWing 907. 区间覆盖
+
+左端点排序，然后从能够覆盖起点的区间中，找一个右端点最大的
+
+```c++
+#include<iostream>
+#include<algorithm>
+#include<cstring>
+
+using namespace std;
+const int N=1e5+10;
+int s,t;
+int n;
+struct Range{
+    int l,r;
+    bool operator <(const Range& rhs)const {
+        return l<rhs.l;
+    }
+}range[N];
+
+int main(){
+    scanf("%d%d",&s,&t);
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        range[i]={a,b};
+    }
+    sort(range,range+n);
+    // int mx=-2e9;
+    int ans=0;
+    bool success=false;
+    //双指针
+    for(int i=0;i<n;i++){
+       int j=i;
+       int mx=-2e9;
+       while(j<n&&range[j].l<=s){
+           
+           mx=max(mx,range[j].r);
+           j++;
+       }
+       //如果最大的右端点都无法覆盖起点，那么返回-1
+       if(mx<s){
+           ans=-1;
+           break;
+       }
+       //结果+1
+       ans++;
+       //如果最大的右端点覆盖了终点，打个标记，如果循环结束，都没有打标记，证明不能完券覆盖区间
+       if(mx>=t){
+           success=true;
+           break;
+       }
+       //更新起点的值
+       s=mx;
+       //更新i，因为最后一个操作是j++,所以下一个需要处理的数据是j
+       i=j-1;
+       
+    }
+    if(!success) ans=-1;
+    printf("%d\n",ans);
+    return 0;
+}
+
+```
+
+### Huffman树
+
+#### AcWing 148. 合并果子
+
+小根堆
+
+```c++
+#include<iostream>
+#include<queue>
+#include<vector>
+using namespace std;
+
+const int N=1e4+10;
+int n;
+
+int main(){
+    scanf("%d",&n);
+    priority_queue<int,vector<int>,greater<int>> q;
+    for(int i=0;i<n;i++){
+        int x;
+        scanf("%d",&x);
+        q.push(x);
+    }
+    int sum=0;
+    while(!q.empty()){
+        int f=q.top();
+        q.pop();
+        int s=q.top();
+        sum+=f+s;
+        q.pop();
+        if(q.empty()) break;
+        q.push(f+s);
+    }
+    printf("%d\n",sum);
+    return 0;
+}
+```
+
+
+
+### 排序不等式
+
+#### AcWing 913. 排队打水
+
+从小到大，最小的在前面
+
+```c++
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=1e5+10;
+int n;
+int a[N];
+int main(){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&a[i]);
+    }
+    sort(a,a+n);
+    long long ans=0;
+    long long sum=0;
+    for(int i=0;i<n;i++){
+        ans+=sum;
+        sum+=a[i];
+    }
+    // cout<<ans<<endl;
+    printf("%lld\n",ans);
+    return 0;
+}
+```
+
+#### AcWing 125. 耍杂技的牛
+
+策略是把重量和强壮度之和小的放上面，和一样，把重量小的往上面放。
+
+```c++
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=1e5+10;
+
+struct Cow{
+    int w,s;
+    bool operator <(const Cow&rhs) const{
+        //策略是把重量和强壮度之和小的放上面，和一样，把重量小的往上面放。
+        if(w+s==(rhs.w+rhs.s)) return w<rhs.w;
+        return (w+s)<(rhs.w+rhs.s);
+        // if(s==rhs.s) return w<rhs.w;
+        // return s<rhs.s;
+    }
+}cow[N];
+int main(){
+    int n;
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        int a,b;
+        scanf("%d%d",&a,&b);
+        cow[i]={a,b};
+    }
+    sort(cow,cow+n);
+    int ans=-1e9;
+    int sum=0;
+    for(int i=0;i<n;i++){
+        ans=max(sum-cow[i].s,ans);
+        sum+=cow[i].w;
+    }
+    printf("%d\n",ans);
+    return 0;
+}
+```
+
+
+
+
+
+2020年9月23日 算法基础课全部刷完一遍
+
+2020年9月24日开始二刷
+
+785
+
+786
+
+787
 
 ### 模板
 
