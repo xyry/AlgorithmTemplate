@@ -67,6 +67,10 @@
 
 [剑指 Offer 20. 表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/) 
 
+#### 二叉树（1）
+
+[106. 从中序与后序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/) 递归
+
 
 
 ### 9月1日  [486. 预测赢家](https://leetcode-cn.com/problems/predict-the-winner/) √
@@ -1258,6 +1262,51 @@ public:
             }
         }
         return ret;
+    }
+};
+```
+
+### 9月25日 [106. 从中序与后序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)  【不熟】
+
+思路，从后序遍历中，找根节点的值，从中序遍历中找值对应的下标，然后区分左右子树，递归处理
+
+不熟练
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    unordered_map<int,int> mp;
+    int post_idx;
+    TreeNode* helper(int in_left,int in_right,vector<int>& inorder,vector<int>& postorder){
+        if(in_left>in_right){
+            return NULL;
+        }
+        int val=postorder[post_idx];
+        TreeNode* root=new TreeNode(val);
+        //通过根节点的值找一下先序遍历中的位置
+        int index=mp[val];
+        post_idx--;
+        root->right=helper(index+1,in_right,inorder,postorder);
+        root->left=helper(in_left,index-1,inorder,postorder);
+        return root;
+    }
+
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        post_idx=postorder.size()-1;
+        int idx=0;
+        for(auto &x:inorder){
+            mp[x]=idx++;
+        }
+        return helper(0,inorder.size()-1,inorder,postorder);
     }
 };
 ```
